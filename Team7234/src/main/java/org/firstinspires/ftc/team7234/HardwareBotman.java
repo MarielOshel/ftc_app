@@ -38,23 +38,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * This is NOT an opmode.
+ * Team 7234
+ * This is NOT an OpMode
  *
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a Pushbot.
- * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
+ * This class contains methods for initialization and control of the robot
  *
- * This hardware class assumes the following device names have been configured on the robot:
- * Note:  All names are lower case and some have single spaces between words.
- *
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"
- * Servo channel:  Servo to open right claw: "right_hand"
  */
 public class HardwareBotman
 {
+    //region Public OpMode members
     /* Public OpMode members. */
     public DcMotor  leftFrontDrive   = null;
     public DcMotor  rightFrontDrive = null;
@@ -74,6 +66,7 @@ public class HardwareBotman
     public static final double LEFT_GRIPPER_CLOSED  = 1;
     public static final double JEWEL_PUSHER_UP = 0.3; //TODO: Find Jewel Pusher Values
     public static final double JEWEL_PUSHER_DOWN = 1.0;
+    //endregion
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
@@ -85,7 +78,7 @@ public class HardwareBotman
 
     /* Constructor */
     HardwareBotman(){}
-    //region Hardware Map
+
     /* Initialize standard Hardware interfaces */
     void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
@@ -129,9 +122,8 @@ public class HardwareBotman
 
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
     }
-    //endregion
-    //region Gripper Control
 
+    //Gripper Control
     void gripperOpen() {
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
@@ -140,7 +132,7 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
         rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
     }
-    //endregion
+
     //region Robot Driving
     void arrayDrive(double lf, double rf, double lb, double rb){
         leftFrontDrive.setPower(lf);
