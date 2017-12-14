@@ -120,7 +120,7 @@ public class BotmanTeleOp extends OpMode{
         //Drives the robot
 
         if (isMecanum){
-            robot.MecanumDrive(angle, magnitude, rotation); //Drives Omnidirectionally
+            robot.mecanumDrive(angle, magnitude, rotation); //Drives Omnidirectionally
         }
         else{
             if(!gamepad1.right_bumper && !gamepad1.left_bumper){ //Drives as tank

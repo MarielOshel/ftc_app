@@ -141,7 +141,7 @@ public class HardwareBotman
         leftBackDrive.setPower(lb);
         rightBackDrive.setPower(rb);
     }
-    void MecanumDrive(double angle, double magnitude, double rotation){  //Calculates and sends values to wheels
+    void mecanumDrive(double angle, double magnitude, double rotation){  //Calculates and sends values to wheels
         //region Exceptions
         if(angle> 1.5 *Math.PI || angle< -0.5*Math.PI){
             throw new IllegalArgumentException("Angle is outside range [-pi/2, 3pi/2]. Invalid Value is: " + Double.toString(angle));
