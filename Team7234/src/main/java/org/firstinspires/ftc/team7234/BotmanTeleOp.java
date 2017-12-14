@@ -112,7 +112,7 @@ public class BotmanTeleOp extends OpMode{
         else if (!gamepad1.b){
             speedToggle = true;
         }
-        driveMultiplier = speedControl ? 1 : 0.5;
+        driveMultiplier = speedControl ? 0.5 : 1;
         //endregion
         //region Robot Control
         //Sends Power to the Robot Arm
@@ -174,6 +174,11 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("FR: ", robot.mecanumSpeeds[1]);
         telemetry.addData("BR: ", robot.mecanumSpeeds[2]);
         telemetry.addData("BL: ", robot.mecanumSpeeds[3]);
+        telemetry.addLine();
+        telemetry.addData("FL-pow: ", robot.driveMotors[0].getPower());
+        telemetry.addData("FR-pow: ", robot.driveMotors[1].getPower());
+        telemetry.addData("BR-pow: ", robot.driveMotors[2].getPower());
+        telemetry.addData("BL-pow: ", robot.driveMotors[3].getPower());
         
         //endregion
     }
