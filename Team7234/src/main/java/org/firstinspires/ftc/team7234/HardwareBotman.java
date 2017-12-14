@@ -167,7 +167,6 @@ public class HardwareBotman
                 speedDivider = Math.abs(mecanumSpeeds[i]);
             }
         }
-
         if (speedDivider > 1) {            //SpeedDivider is only called if it is necessary to maintain ranges
             for (int i=0; i<4; i++) {
                 mecanumSpeeds[i] /= speedDivider;
@@ -194,11 +193,11 @@ public class HardwareBotman
         return output;
     }
 
-    public double ticsPerInch(double distance){
+    double ticsPerInch(double distance){
         return (280/Math.PI) * distance;
     }
 
-    public void resetEncoders() {
+    void resetEncoders() {
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
