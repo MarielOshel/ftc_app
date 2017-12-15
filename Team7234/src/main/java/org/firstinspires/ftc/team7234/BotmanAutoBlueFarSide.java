@@ -56,6 +56,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
     public enum currentState {
         KEY,
         JEWELS,
+        TWIST_FORWARD, TWIST_BACKWARD,
         MOVE,
         LEFT, CENTER, RIGHT,
         SCORE
@@ -100,32 +101,43 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             case JEWELS:
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
-                robot.jewelPusher.setPosition(.1);
+                robot.jewelPusher.setPosition(1);
+                telemetry.addData("Encoder count", robot.leftBackDrive.getCurrentPosition());
 
-                if(robot.hsvValues[0] > 210 || robot.hsvValues[0] < 240){
-                    if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
-                        robot.arrayDrive(0.5, 0, 0.5, 0);
-                    }
-                    else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-0.9)){
-                        robot.jewelPusher.setPosition(.9);
-                        robot.arrayDrive(-0.5, 0, -0.5, 0);
-                        programState = currentState.MOVE;
-                    }
+                if((robot.hsvValues[0] > 150 && robot.hsvValues[0] < 180) && (robot.hsvValues[1] > .5)){
+                    programState = currentState.TWIST_FORWARD;
                 }
-                else if(robot.hsvValues[0] > 345 || robot.hsvValues[0] < 15) {
-                    if(robot.rightBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
-                        robot.arrayDrive(0, 0.5, 0, 0.5);
-                    }
-                    else if (robot.rightBackDrive.getCurrentPosition() >= robot.ticsPerInch(-0.9)){
-                        robot.jewelPusher.setPosition(.9);
-                        robot.arrayDrive(0, -0.5, 0, -0.5);
-                        programState = currentState.MOVE;
-                    }
+                else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
+                    programState = currentState.TWIST_BACKWARD;
                 }
-                telemetry.addData("HSV is", robot.hsvValues);
                 break;
 
-            /*case MOVE:
+            case TWIST_FORWARD:
+                if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-1)){
+                    robot.arrayDrive(0.1, -0.1, 0.1, -0.1);
+                }
+                else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(0)){
+                    robot.jewelPusher.setPosition(.2);
+                    robot.arrayDrive(0, 0, 0, 0);
+                    programState = currentState.MOVE;
+                }
+                break;
+
+            case TWIST_BACKWARD:
+                if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
+                    robot.arrayDrive(-0.1, 0.1, -0.1, 0.1);
+                }
+                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(0 )){
+                    robot.jewelPusher.setPosition(.2);
+                    robot.arrayDrive(0, 0, 0, 0);
+                    programState = currentState.MOVE;
+                }
+                break;
+
+            case MOVE:
+                robot.arrayDrive(0,0,0,0);
+                break; //remove after testing
+                /*
                 robot.arrayDrive(1, 1, 1, 1);
 
                 if (robot.leftBackDrive.getCurrentPosition() >= Math.abs(robot.ticsPerInch(12))){
