@@ -72,8 +72,8 @@ public class HardwareBotman
     public static final double LEFT_GRIPPER_OPEN  = 0 ;
     public static final double RIGHT_GRIPPER_CLOSED    =  0 ;
     public static final double LEFT_GRIPPER_CLOSED  = 1;
-    public static final double JEWEL_PUSHER_UP = 0.3; //TODO: Find Jewel Pusher Values
-    public static final double JEWEL_PUSHER_DOWN = 1.0;
+    public static final double JEWEL_PUSHER_UP = 0.35; //TODO: Find Jewel Pusher Values
+    public static final double JEWEL_PUSHER_DOWN = 0.95;
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};

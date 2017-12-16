@@ -134,7 +134,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(0 )){
+                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-5 )){
                     robot.jewelPusher.setPosition(.3);
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                     programState = currentState.MOVE;

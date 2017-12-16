@@ -62,7 +62,7 @@ public class BotmanTeleOp extends OpMode{
         gripperClosed = true;
         gripperToggle = true;
         speedToggle = true;
-        speedControl = false;
+        speedControl = true;
         //endregion
 
     }
@@ -84,7 +84,7 @@ public class BotmanTeleOp extends OpMode{
         double magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
 
         // How much the robot should turn while moving in that direction
-        double rotation = Range.clip(gamepad1.right_stick_x, -1, 1);
+        double rotation = driveMultiplier*Range.clip(gamepad1.right_stick_x, -1, 1);
 
         //Variables for tank drive
         double left = -gamepad1.left_stick_y;
@@ -112,6 +112,8 @@ public class BotmanTeleOp extends OpMode{
         else if (!gamepad1.b){
             speedToggle = true;
         }
+
+
         driveMultiplier = speedControl ? 0.5 : 1;
         //endregion
         //region Robot Control
