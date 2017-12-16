@@ -97,7 +97,7 @@ public class BotmanAutoRedClose extends OpMode {
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
                 telemetry.addData("HSV is", robot.hsvValues );
 
-                if (robot.hsvValues = );
+                if (robot.hsvValues = ); //TODO: Ricky Fix this
 
                 else
 
