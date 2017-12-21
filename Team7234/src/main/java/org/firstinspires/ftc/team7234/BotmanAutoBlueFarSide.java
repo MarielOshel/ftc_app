@@ -64,7 +64,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
 //Swag 420 blaze it
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, true);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
@@ -100,15 +100,11 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
                 telemetry.addData("We are seeing", keyFinder);
                 programState = currentState.JEWELS;
-                if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(1)){
-                    robot.arrayDrive(-0.25,0.25,0.25,-0.25);
-                }
                 break;
 
             case JEWELS:
-                robot.resetEncoders();
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
-                robot.jewelPusher.setPosition(1);
+                robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_DOWN);
                 telemetry.addData("Encoder count", robot.leftBackDrive.getCurrentPosition());
 
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
@@ -117,26 +113,26 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
                     programState = currentState.TWIST_BACKWARD;
                 }
-                break; //"420 Blaze it. ALL DAY EVERY DAY"
+                break;
 
             case TWIST_FORWARD:
                 if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-1)){
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
+                    robot.arrayDrive(0.3, 0.3, 0.3, 0.3);
                 }
                 else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(0)){
-                    robot.jewelPusher.setPosition(.3);
-                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
+                    robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    robot.arrayDrive(-0.3, -0.3, -0.3, -0.3);
                     programState = currentState.MOVE;
                 }
                 break;
 
             case TWIST_BACKWARD:
                 if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
-                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
+                    robot.arrayDrive(-0.3, -0.3, -0.3, -0.3);
                 }
                 else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-5 )){
-                    robot.jewelPusher.setPosition(.3);
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
+                    robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    robot.arrayDrive(0.3, 0.3, 0.3, 0.3);
                     programState = currentState.MOVE;
                 }
                 break;

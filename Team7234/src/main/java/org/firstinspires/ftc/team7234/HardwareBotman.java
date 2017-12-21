@@ -79,7 +79,7 @@ public class HardwareBotman
     HardwareBotman(){}
 
     /* Initialize standard Hardware interfaces */
-    void init(HardwareMap ahwMap) {
+    void init(HardwareMap ahwMap, boolean reverseRight) {
         // Save reference to Hardware map
         hwMap = ahwMap;
 
@@ -89,10 +89,19 @@ public class HardwareBotman
         leftBackDrive = hwMap.get(DcMotor.class, "left Back Drive");
         rightBackDrive = hwMap.get(DcMotor.class, "right Back Drive");
         arm    = hwMap.get(DcMotor.class, "arm");
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        if (reverseRight){
+            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+            leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+            rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        }
+        else{
+            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+            leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+            rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        }
+
 
         // Set all motors to zero power
         leftFrontDrive.setPower(0);
