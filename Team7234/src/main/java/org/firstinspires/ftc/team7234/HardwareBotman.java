@@ -60,16 +60,28 @@ public class HardwareBotman
     public float hsvValues[] = {0F, 0F, 0F};
 
     public static final double MID_SERVO       =  0.5 ;
+
     public static final double RIGHT_GRIPPER_OPEN    =  1 ;
     public static final double LEFT_GRIPPER_OPEN  = 0 ;
+
+    public static final double RIGHT_GRIPPER_HALF = 0.5;
+    public static final double LEFT_GRIPPER_HALF = 0.5;
+
     public static final double RIGHT_GRIPPER_CLOSED    =  0 ;
     public static final double LEFT_GRIPPER_CLOSED  = 1;
+
     public static final double JEWEL_PUSHER_UP = 0.35; //TODO: Find Jewel Pusher Values
     public static final double JEWEL_PUSHER_DOWN = 0.95;
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
     DcMotor[] driveMotors;
+
+    public enum GripperState{
+        OPEN,
+        HALFWAY,
+        CLOSED
+    }
 
     /* local OpMode members. */
     private HardwareMap hwMap           =  null;

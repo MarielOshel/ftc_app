@@ -156,7 +156,6 @@ public class BotmanTeleOp extends OpMode{
         //endregion
         //region Gripper Control
 
-
         if (!gripperClosed){
             robot.gripperOpen();
         }
