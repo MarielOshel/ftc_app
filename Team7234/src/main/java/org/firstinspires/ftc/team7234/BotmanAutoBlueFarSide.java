@@ -148,7 +148,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 robot.arrayDrive(1, 1, 1, 1);
 
                 if (robot.leftBackDrive.getCurrentPosition() >= Math.abs(robot.ticsPerInch(12))){
-                    robot.MecanumDrive(0, 0, 0);
+                    robot.mecanumDrive(0, 0, 0);
                 }
                 else{
                     robot.resetEncoders();

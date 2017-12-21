@@ -45,7 +45,7 @@ public class BotmanTeleOp extends OpMode{
     private double driveMultiplier = 1.0;
     private boolean isMecanum;
 
-    private boolean buttonToggle;
+    private boolean mecanumToggle;
     private boolean gripperClosed;
     private boolean gripperToggle;
     private boolean speedControl;
@@ -56,13 +56,17 @@ public class BotmanTeleOp extends OpMode{
     public void init() {
         robot.init(hardwareMap);
         //region Boolean Initialization
-        isMecanum = true;
 
-        buttonToggle = true;
+        //Controlling Booleans
+        isMecanum = true;
+        speedControl = false;
         gripperClosed = true;
+
+        //Toggle Booleans
+        mecanumToggle = true;
         gripperToggle = true;
         speedToggle = true;
-        speedControl = true;
+
         //endregion
 
     }
@@ -73,35 +77,44 @@ public class BotmanTeleOp extends OpMode{
     @Override
     public void loop() {
         //region Drive Variables
-        
+
         //calculates angle in radians based on joystick position, reports in range [-Pi/2, 3Pi/2]
         double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
         if (Double.isNaN(angle)){
             angle = 0;              //Prevents NaN error later in the Program
         }
-
         //calculates robot speed from the joystick's distance from the center
         double magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
-
         // How much the robot should turn while moving in that direction
         double rotation = driveMultiplier*Range.clip(gamepad1.right_stick_x, -1, 1);
 
         //Variables for tank drive
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
-        //double armStick = -gamepad2.left_stick_y;
-        double armStick = gamepad2.left_trigger - gamepad2.right_trigger;
+        //Variable for arm control
+        double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
 
-        if (buttonToggle){ //Toggles drive mode based on the x button
+        //region Toggles
+        if (mecanumToggle){ //Toggles drive mode based on the x button
             if (gamepad1.x){
                 isMecanum = !isMecanum;
-                buttonToggle = false;
+                mecanumToggle = false;
             }
         }
         else if (!gamepad1.x) {
-            buttonToggle = true;
+            mecanumToggle = true;
         }
 
+        //toggles gripper open/closed based on the gamepad 2 a button
+        if (gripperToggle){
+            if (gamepad2.a){
+                gripperClosed = !gripperClosed;
+                gripperToggle = false;
+            }
+        }
+        else if (!gamepad2.a){
+            gripperToggle = true;
+        }
 
         if (speedToggle){
             if(gamepad1.b){
@@ -112,17 +125,18 @@ public class BotmanTeleOp extends OpMode{
         else if (!gamepad1.b){
             speedToggle = true;
         }
-
-
-        driveMultiplier = speedControl ? 0.5 : 1;
         //endregion
+        driveMultiplier = speedControl ? 0.5 : 1;
+
+        //endregion
+
         //region Robot Control
         //Sends Power to the Robot Arm
-        robot.arm.setPower(armStick);
+        robot.arm.setPower(armPower);
         //Drives the robot
 
         if (isMecanum){
-            robot.MecanumDrive(angle, magnitude, rotation); //Drives Omnidirectionally
+            robot.mecanumDrive(angle, magnitude, rotation); //Drives Omnidirectionally
         }
         else{
             if(!gamepad1.right_bumper && !gamepad1.left_bumper){ //Drives as tank
@@ -138,26 +152,18 @@ public class BotmanTeleOp extends OpMode{
                 robot.arrayDrive(0, 0, 0, 0); //Stop
             }
         }
-        
+
         //endregion
         //region Gripper Control
-        
-        if (gripperToggle){
-            if (gamepad2.a){
-                gripperClosed = !gripperClosed;
-                gripperToggle = false;
-            }
-        }
-        else if (!gamepad2.a){
-            gripperToggle = true;
-        }
+
+
         if (!gripperClosed){
             robot.gripperOpen();
         }
         else{
             robot.gripperClose();
         }
-        
+
         //endregion
         //region Telemetry
 
@@ -181,7 +187,7 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("FR-pow: ", robot.driveMotors[1].getPower());
         telemetry.addData("BR-pow: ", robot.driveMotors[2].getPower());
         telemetry.addData("BL-pow: ", robot.driveMotors[3].getPower());
-        
+
         //endregion
     }
     @Override
