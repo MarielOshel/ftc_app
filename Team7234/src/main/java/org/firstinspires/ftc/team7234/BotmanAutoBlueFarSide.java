@@ -58,6 +58,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
         JEWELS,
         TWIST_FORWARD, TWIST_BACKWARD,
         MOVE,
+        MOVE_RIGHT,
         LEFT, CENTER, RIGHT,
         SCORE
     }
@@ -117,28 +118,32 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             case TWIST_FORWARD:
                 if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-1)){
-                    robot.arrayDrive(0.3, 0.3, 0.3, 0.3);
+                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
                 else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(0)){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(-0.3, -0.3, -0.3, -0.3);
+                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                     programState = currentState.MOVE;
                 }
                 break;
 
             case TWIST_BACKWARD:
                 if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
-                    robot.arrayDrive(-0.3, -0.3, -0.3, -0.3);
+                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
                 else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-5 )){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(0.3, 0.3, 0.3, 0.3);
+                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                     programState = currentState.MOVE;
                 }
                 break;
 
             case MOVE:
                 robot.arrayDrive(0,0,0,0);
+                if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(8)){
+                    robot.arrayDrive(0.5,0.5,0.5,0.5);
+                    programState = currentState.MOVE_RIGHT;
+                }
                 break; //remove after testing
                 /*
                 robot.arrayDrive(1, 1, 1, 1);
@@ -158,7 +163,9 @@ public class BotmanAutoBlueFarSide extends OpMode {
                         programState = currentState.RIGHT;
                     }
                 }
-                break;
+                break;*/
+            case MOVE_RIGHT:
+                robot.arrayDrive(0,0,0,0);
 
             /*case LEFT:
 
