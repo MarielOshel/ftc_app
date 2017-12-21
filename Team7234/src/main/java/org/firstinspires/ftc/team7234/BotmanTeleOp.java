@@ -77,7 +77,7 @@ public class BotmanTeleOp extends OpMode{
     @Override
     public void loop() {
         //region Drive Variables
-        
+
         //calculates angle in radians based on joystick position, reports in range [-Pi/2, 3Pi/2]
         double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
         if (Double.isNaN(angle)){
@@ -86,7 +86,7 @@ public class BotmanTeleOp extends OpMode{
         //calculates robot speed from the joystick's distance from the center
         double magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
         // How much the robot should turn while moving in that direction
-        double rotation = Range.clip(gamepad1.right_stick_x, -1, 1);
+        double rotation = driveMultiplier*Range.clip(gamepad1.right_stick_x, -1, 1);
 
         //Variables for tank drive
         double left = -gamepad1.left_stick_y;
@@ -152,10 +152,10 @@ public class BotmanTeleOp extends OpMode{
                 robot.arrayDrive(0, 0, 0, 0); //Stop
             }
         }
-        
+
         //endregion
         //region Gripper Control
-        
+
 
         if (!gripperClosed){
             robot.gripperOpen();
@@ -163,7 +163,7 @@ public class BotmanTeleOp extends OpMode{
         else{
             robot.gripperClose();
         }
-        
+
         //endregion
         //region Telemetry
 
@@ -187,7 +187,7 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("FR-pow: ", robot.driveMotors[1].getPower());
         telemetry.addData("BR-pow: ", robot.driveMotors[2].getPower());
         telemetry.addData("BL-pow: ", robot.driveMotors[3].getPower());
-        
+
         //endregion
     }
     @Override

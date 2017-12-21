@@ -38,14 +38,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-import static com.sun.tools.javac.util.Constants.format;
-
 /**
  * Demonstrates empty OpMode
  */
-@Autonomous(name = "Botman Auto Blue Far", group = "Example")
+@Autonomous(name = "Botman Auto Red Far", group = "Example")
 //@Disabled
-public class BotmanAutoBlueFarSide extends OpMode {
+public class BotmanAutoRedFarSide extends OpMode {
 
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
@@ -99,31 +97,30 @@ public class BotmanAutoBlueFarSide extends OpMode {
             case KEY:
 
                 telemetry.addData("We are seeing", keyFinder);
-                programState = currentState.JEWELS;
                 if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(1)){
                     robot.arrayDrive(-0.25,0.25,0.25,-0.25);
+                    programState = currentState.JEWELS;
                 }
                 break;
 
             case JEWELS:
-                robot.resetEncoders();
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
                 robot.jewelPusher.setPosition(1);
                 telemetry.addData("Encoder count", robot.leftBackDrive.getCurrentPosition());
 
-                if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
-                    programState = currentState.TWIST_FORWARD;
-                }
-                else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
+                if((robot.hsvValues[0] > 180 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
                     programState = currentState.TWIST_BACKWARD;
                 }
-                break; //"420 Blaze it. ALL DAY EVERY DAY"
+                else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
+                    programState = currentState.TWIST_FORWARD;
+                }
+                break;
 
             case TWIST_FORWARD:
                 if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-1)){
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
-                else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(0)){
+                else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(5)){
                     robot.jewelPusher.setPosition(.3);
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                     programState = currentState.MOVE;
@@ -134,7 +131,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-5 )){
+                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(0 )){
                     robot.jewelPusher.setPosition(.3);
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                     programState = currentState.MOVE;
@@ -148,7 +145,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 robot.arrayDrive(1, 1, 1, 1);
 
                 if (robot.leftBackDrive.getCurrentPosition() >= Math.abs(robot.ticsPerInch(12))){
-                    robot.mecanumDrive(0, 0, 0);
+                    robot.MecanumDrive(0, 0, 0);
                 }
                 else{
                     robot.resetEncoders();
