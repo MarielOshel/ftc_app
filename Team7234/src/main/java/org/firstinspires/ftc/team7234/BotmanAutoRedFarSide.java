@@ -62,7 +62,7 @@ public class BotmanAutoRedFarSide extends OpMode {
 //Swag 420 blaze it
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, false);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }

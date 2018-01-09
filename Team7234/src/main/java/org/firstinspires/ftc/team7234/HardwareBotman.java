@@ -80,7 +80,15 @@ public class HardwareBotman
     public enum GripperState{
         OPEN,
         HALFWAY,
-        CLOSED
+        CLOSED;
+
+        private static GripperState[] vals = values();
+        public GripperState next(){  //Code from https://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
+            return vals[(this.ordinal()+1) % vals.length];
+        }
+        public GripperState previous(){
+            return vals[(this.ordinal()-1) % vals.length]; //check to prevent errors with negative return from %
+        }
     }
 
     /* local OpMode members. */
@@ -139,7 +147,22 @@ public class HardwareBotman
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
     }
 
-    //Gripper Control
+    //region Gripper Control
+    void gripperSet(GripperState state){
+        if(state == GripperState.OPEN){
+            leftClaw.setPosition(LEFT_GRIPPER_OPEN);
+            rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
+        }
+        else if (state == GripperState.HALFWAY){
+            leftClaw.setPosition(LEFT_GRIPPER_HALF);
+            rightClaw.setPosition(RIGHT_GRIPPER_HALF);
+        }
+        else if (state == GripperState.CLOSED){
+            leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
+            rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
+        }
+    }
+
     void gripperOpen() {
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
@@ -148,6 +171,7 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
         rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
     }
+    //endregion
 
     //region Robot Driving
     void arrayDrive(double lf, double rf, double lb, double rb){
