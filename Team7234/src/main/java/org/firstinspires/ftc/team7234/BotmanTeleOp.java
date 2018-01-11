@@ -46,10 +46,11 @@ public class BotmanTeleOp extends OpMode{
     private boolean isMecanum;
 
     private boolean mecanumToggle;
-    private boolean gripperClosed;
     private boolean gripperToggle;
     private boolean speedControl;
     private boolean speedToggle;
+
+    private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
     //endregion
 
     @Override
@@ -60,7 +61,6 @@ public class BotmanTeleOp extends OpMode{
         //Controlling Booleans
         isMecanum = true;
         speedControl = false;
-        gripperClosed = true;
 
         //Toggle Booleans
         mecanumToggle = true;
@@ -68,6 +68,8 @@ public class BotmanTeleOp extends OpMode{
         speedToggle = true;
 
         //endregion
+
+
 
     }
     @Override
@@ -105,10 +107,10 @@ public class BotmanTeleOp extends OpMode{
             mecanumToggle = true;
         }
 
-        //toggles gripper open/closed based on the gamepad 2 a button
+        //cycles through gripper states, once for each button press
         if (gripperToggle){
             if (gamepad2.a){
-                gripperClosed = !gripperClosed;
+                gripState = gripState.next();
                 gripperToggle = false;
             }
         }
@@ -155,19 +157,12 @@ public class BotmanTeleOp extends OpMode{
 
         //endregion
         //region Gripper Control
-
-        if (!gripperClosed){
-            robot.gripperOpen();
-        }
-        else{
-            robot.gripperClose();
-        }
-
+        robot.gripperSet(gripState);
         //endregion
         //region Telemetry
 
         telemetry.addData("isMecanum: ", isMecanum);
-        telemetry.addData("gripperClosed: ", gripperClosed);
+        telemetry.addData("gripperState: ", gripState);
         telemetry.addData("Speed Limited to: ", driveMultiplier);
         telemetry.addLine();
         telemetry.addData("Angle: ", angle);

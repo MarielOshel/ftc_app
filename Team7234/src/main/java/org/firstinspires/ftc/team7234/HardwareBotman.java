@@ -83,11 +83,12 @@ public class HardwareBotman
         CLOSED;
 
         private static GripperState[] vals = values();
+
         public GripperState next(){  //Code from https://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
             return vals[(this.ordinal()+1) % vals.length];
         }
         public GripperState previous(){
-            return vals[(this.ordinal()-1) % vals.length]; //check to prevent errors with negative return from %
+            return vals[(this.ordinal()-1) % vals.length];
         }
     }
 
@@ -147,7 +148,9 @@ public class HardwareBotman
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
     }
 
+
     //region Gripper Control
+
     void gripperSet(GripperState state){
         if(state == GripperState.OPEN){
             leftClaw.setPosition(LEFT_GRIPPER_OPEN);
