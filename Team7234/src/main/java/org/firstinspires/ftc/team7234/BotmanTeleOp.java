@@ -156,9 +156,11 @@ public class BotmanTeleOp extends OpMode{
         }
 
         //endregion
+
         //region Gripper Control
         robot.gripperSet(gripState);
         //endregion
+
         //region Telemetry
 
         telemetry.addData("isMecanum: ", isMecanum);

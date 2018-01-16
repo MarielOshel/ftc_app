@@ -152,20 +152,24 @@ public class HardwareBotman
     //region Gripper Control
 
     void gripperSet(GripperState state){
-        if(state == GripperState.OPEN){
-            leftClaw.setPosition(LEFT_GRIPPER_OPEN);
-            rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
-        }
-        else if (state == GripperState.HALFWAY){
-            leftClaw.setPosition(LEFT_GRIPPER_HALF);
-            rightClaw.setPosition(RIGHT_GRIPPER_HALF);
-        }
-        else if (state == GripperState.CLOSED){
-            leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
-            rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
+        switch (state){
+            case OPEN:
+                leftClaw.setPosition(LEFT_GRIPPER_OPEN);
+                rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
+                break;
+            case HALFWAY:
+                leftClaw.setPosition(LEFT_GRIPPER_HALF);
+                rightClaw.setPosition(RIGHT_GRIPPER_HALF);
+                break;
+            case CLOSED:
+                leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
+                rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
+                break;
+            default: throw new IllegalArgumentException("GripperState contains an unexpected value. I'm not even sure how you managed this.");
         }
     }
 
+    /* Old code no longer used
     void gripperOpen() {
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
@@ -174,6 +178,9 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
         rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
     }
+
+    */
+
     //endregion
 
     //region Robot Driving
