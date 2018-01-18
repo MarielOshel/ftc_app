@@ -66,7 +66,7 @@ public class BotmanAutoSkeleton extends OpMode {
 
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, true);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
