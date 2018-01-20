@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.Range;
 public class BotmanTeleOp extends OpMode{
 
     /* Declare OpMode members. */
-    HardwareBotman robot       = new HardwareBotman();
+    private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
     //Declares the power scaling of the robot
     private static final double driveCurve = 1.0;
@@ -113,8 +113,12 @@ public class BotmanTeleOp extends OpMode{
                 gripState = gripState.next();
                 gripperToggle = false;
             }
+            if (gamepad2.b){
+                gripState = gripState.previous();
+                gripperToggle = false;
+            }
         }
-        else if (!gamepad2.a){
+        else if (!(gamepad2.a || gamepad2.b) ){
             gripperToggle = true;
         }
 

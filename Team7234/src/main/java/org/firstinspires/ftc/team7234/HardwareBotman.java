@@ -47,7 +47,7 @@ import com.qualcomm.robotcore.util.Range;
 public class HardwareBotman
 {
     //region Public OpMode members
-    /* Public OpMode members. */
+
     public DcMotor  leftFrontDrive   = null;
     public DcMotor  rightFrontDrive = null;
     public DcMotor leftBackDrive = null;
@@ -61,14 +61,14 @@ public class HardwareBotman
 
     public static final double MID_SERVO       =  0.5 ;
 
-    public static final double RIGHT_GRIPPER_OPEN    =  1 ;
-    public static final double LEFT_GRIPPER_OPEN  = 0 ;
+    public static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    public static final double LEFT_GRIPPER_OPEN  = 1 ;
 
-    public static final double RIGHT_GRIPPER_HALF = 0.5;
-    public static final double LEFT_GRIPPER_HALF = 0.5;
+    public static final double RIGHT_GRIPPER_HALF = 0.7;
+    public static final double LEFT_GRIPPER_HALF = 0.3;
 
-    public static final double RIGHT_GRIPPER_CLOSED    =  0 ;
-    public static final double LEFT_GRIPPER_CLOSED  = 1;
+    public static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    public static final double LEFT_GRIPPER_CLOSED  = 0;
 
     public static final double JEWEL_PUSHER_UP = 0.35; //TODO: Find Jewel Pusher Values
     public static final double JEWEL_PUSHER_DOWN = 0.95;
