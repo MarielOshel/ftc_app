@@ -47,29 +47,50 @@ import com.qualcomm.robotcore.util.Range;
 public class HardwareBotman
 {
     //region Public OpMode members
-    /* Public OpMode members. */
-    public DcMotor  leftFrontDrive   = null;
-    public DcMotor  rightFrontDrive = null;
-    public DcMotor leftBackDrive = null;
-    public DcMotor rightBackDrive = null;
-    public DcMotor  arm     = null;
-    public Servo    leftClaw    = null;
-    public Servo    rightClaw   = null;
-    public Servo jewelPusher = null;
-    public ColorSensor jewelColorSensor = null;
-    public float hsvValues[] = {0F, 0F, 0F};
+
+    private DcMotor  leftFrontDrive   = null;
+    private DcMotor  rightFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightBackDrive = null;
+    DcMotor  arm     = null;
+    private Servo    leftClaw    = null;
+    private Servo    rightClaw   = null;
+    private Servo jewelPusher = null;
+    private ColorSensor jewelColorSensor = null;
+    private float hsvValues[] = {0F, 0F, 0F};
 
     public static final double MID_SERVO       =  0.5 ;
-    public static final double RIGHT_GRIPPER_OPEN    =  1 ;
-    public static final double LEFT_GRIPPER_OPEN  = 0 ;
-    public static final double RIGHT_GRIPPER_CLOSED    =  0 ;
-    public static final double LEFT_GRIPPER_CLOSED  = 1;
-    public static final double JEWEL_PUSHER_UP = 0.35; //TODO: Find Jewel Pusher Values
-    public static final double JEWEL_PUSHER_DOWN = 0.95;
+
+    private static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    private static final double LEFT_GRIPPER_OPEN  = 1 ;
+
+    private static final double RIGHT_GRIPPER_HALF = 0.7;
+    private static final double LEFT_GRIPPER_HALF = 0.3;
+
+    private static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    private static final double LEFT_GRIPPER_CLOSED  = 0;
+
+    private static final double JEWEL_PUSHER_UP = 0.35;
+    private static final double JEWEL_PUSHER_DOWN = 0.95;
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
     DcMotor[] driveMotors;
+
+    public enum GripperState{
+        OPEN,
+        HALFWAY,
+        CLOSED;
+
+        private static GripperState[] vals = values();
+
+        public GripperState next(){  //Code from https://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
+            return vals[(this.ordinal()+1) % vals.length];
+        }
+        public GripperState previous(){
+            return vals[(this.ordinal()-1) % vals.length];
+        }
+    }
 
     /* local OpMode members. */
     private HardwareMap hwMap           =  null;
@@ -127,7 +148,28 @@ public class HardwareBotman
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
     }
 
-    //Gripper Control
+
+    //region Gripper Control
+
+    void gripperSet(GripperState state){
+        switch (state){
+            case OPEN:
+                leftClaw.setPosition(LEFT_GRIPPER_OPEN);
+                rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
+                break;
+            case HALFWAY:
+                leftClaw.setPosition(LEFT_GRIPPER_HALF);
+                rightClaw.setPosition(RIGHT_GRIPPER_HALF);
+                break;
+            case CLOSED:
+                leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
+                rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
+                break;
+            default: throw new IllegalArgumentException("GripperState contains an unexpected value. I'm not even sure how you managed this.");
+        }
+    }
+
+    /* Old code no longer used
     void gripperOpen() {
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
@@ -136,6 +178,10 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
         rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
     }
+
+    */
+
+    //endregion
 
     //region Robot Driving
     void arrayDrive(double lf, double rf, double lb, double rb){
