@@ -48,30 +48,30 @@ public class HardwareBotman
 {
     //region Public OpMode members
 
-    public DcMotor  leftFrontDrive   = null;
-    public DcMotor  rightFrontDrive = null;
-    public DcMotor leftBackDrive = null;
-    public DcMotor rightBackDrive = null;
-    public DcMotor  arm     = null;
-    public Servo    leftClaw    = null;
-    public Servo    rightClaw   = null;
-    public Servo jewelPusher = null;
-    public ColorSensor jewelColorSensor = null;
-    public float hsvValues[] = {0F, 0F, 0F};
+    private DcMotor  leftFrontDrive   = null;
+    private DcMotor  rightFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightBackDrive = null;
+    DcMotor  arm     = null;
+    private Servo    leftClaw    = null;
+    private Servo    rightClaw   = null;
+    private Servo jewelPusher = null;
+    private ColorSensor jewelColorSensor = null;
+    private float hsvValues[] = {0F, 0F, 0F};
 
     public static final double MID_SERVO       =  0.5 ;
 
-    public static final double RIGHT_GRIPPER_OPEN    =  0 ;
-    public static final double LEFT_GRIPPER_OPEN  = 1 ;
+    private static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    private static final double LEFT_GRIPPER_OPEN  = 1 ;
 
-    public static final double RIGHT_GRIPPER_HALF = 0.7;
-    public static final double LEFT_GRIPPER_HALF = 0.3;
+    private static final double RIGHT_GRIPPER_HALF = 0.7;
+    private static final double LEFT_GRIPPER_HALF = 0.3;
 
-    public static final double RIGHT_GRIPPER_CLOSED    =  1 ;
-    public static final double LEFT_GRIPPER_CLOSED  = 0;
+    private static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    private static final double LEFT_GRIPPER_CLOSED  = 0;
 
-    public static final double JEWEL_PUSHER_UP = 0.35; //TODO: Find Jewel Pusher Values
-    public static final double JEWEL_PUSHER_DOWN = 0.95;
+    private static final double JEWEL_PUSHER_UP = 0.35;
+    private static final double JEWEL_PUSHER_DOWN = 0.95;
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
