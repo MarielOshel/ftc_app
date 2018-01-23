@@ -31,8 +31,10 @@ package org.firstinspires.ftc.team7234;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.configuration.ExpansionHubMotorControllerPositionParams;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -48,16 +50,22 @@ public class HardwareBotman
 {
     //region Public OpMode members
 
-    private DcMotor  leftFrontDrive   = null;
-    private DcMotor  rightFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightBackDrive = null;
+    DcMotor  leftFrontDrive   = null;
+    DcMotor  rightFrontDrive = null;
+    DcMotor leftBackDrive = null;
+    DcMotor rightBackDrive = null;
     DcMotor  arm     = null;
-    private Servo    leftClaw    = null;
-    private Servo    rightClaw   = null;
-    private Servo jewelPusher = null;
-    private ColorSensor jewelColorSensor = null;
-    private float hsvValues[] = {0F, 0F, 0F};
+    Servo    leftClaw    = null;
+    Servo    rightClaw   = null;
+    Servo jewelPusher = null;
+
+    DigitalChannel armLimit = null;
+
+    ColorSensor jewelColorSensor = null;
+
+
+
+    float hsvValues[] = {0F, 0F, 0F};
 
     public static final double MID_SERVO       =  0.5 ;
 
@@ -70,8 +78,8 @@ public class HardwareBotman
     private static final double RIGHT_GRIPPER_CLOSED    =  1 ;
     private static final double LEFT_GRIPPER_CLOSED  = 0;
 
-    private static final double JEWEL_PUSHER_UP = 0.35;
-    private static final double JEWEL_PUSHER_DOWN = 0.95;
+    static final double JEWEL_PUSHER_UP = 0.35;
+    static final double JEWEL_PUSHER_DOWN = 0.95;
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
@@ -110,6 +118,7 @@ public class HardwareBotman
         leftBackDrive = hwMap.get(DcMotor.class, "left Back Drive");
         rightBackDrive = hwMap.get(DcMotor.class, "right Back Drive");
         arm    = hwMap.get(DcMotor.class, "arm");
+
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -143,7 +152,10 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
+
+        //Define sensors
         jewelColorSensor = hwMap.get(ColorSensor.class, "jewelColorSensor");
+        armLimit = hwMap.get(DigitalChannel.class, "armLimiter");
 
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
     }
@@ -181,6 +193,12 @@ public class HardwareBotman
 
     */
 
+    //endregion
+
+    //region Relic Arm Control
+    public void extendRelicArm(){
+
+    }
     //endregion
 
     //region Robot Driving

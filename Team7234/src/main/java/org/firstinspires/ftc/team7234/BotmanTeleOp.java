@@ -43,14 +43,18 @@ public class BotmanTeleOp extends OpMode{
     //Declares the power scaling of the robot
     private static final double driveCurve = 1.0;
     private double driveMultiplier = 1.0;
+    private double armPower = 0;
     private boolean isMecanum;
 
     private boolean mecanumToggle;
     private boolean gripperToggle;
     private boolean speedControl;
     private boolean speedToggle;
+    private boolean relicToggle;
+
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
+
     //endregion
 
     @Override
@@ -66,6 +70,7 @@ public class BotmanTeleOp extends OpMode{
         mecanumToggle = true;
         gripperToggle = true;
         speedToggle = true;
+        relicToggle = true;
 
         //endregion
 
@@ -94,7 +99,12 @@ public class BotmanTeleOp extends OpMode{
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
         //Variable for arm control
-        double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+
+        armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+
+        if (robot.armLimit.getState() && armPower < 0){
+            armPower = 0;
+        }
 
         //region Toggles
         if (mecanumToggle){ //Toggles drive mode based on the x button
@@ -121,6 +131,10 @@ public class BotmanTeleOp extends OpMode{
         else if (!(gamepad2.a || gamepad2.b) ){
             gripperToggle = true;
         }
+
+        /*if (relicToggle){ TODO: Finish this
+
+        }*/
 
         if (speedToggle){
             if(gamepad1.b){
