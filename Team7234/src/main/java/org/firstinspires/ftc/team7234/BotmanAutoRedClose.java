@@ -64,7 +64,7 @@ public class BotmanAutoRedClose extends OpMode {
 
     @Override
     public void init() {
-        robot.init(hardwareMap, false);
+        robot.init(hardwareMap, true);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
