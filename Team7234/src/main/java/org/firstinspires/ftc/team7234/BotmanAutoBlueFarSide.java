@@ -156,6 +156,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             //This case simply moves the robot forward 8 inches
             case MOVE:
+                robot.resetEncoders();
                 robot.arrayDrive(0,0,0,0);
                 if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(8)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
