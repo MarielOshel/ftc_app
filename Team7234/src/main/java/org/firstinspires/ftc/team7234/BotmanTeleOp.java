@@ -1,32 +1,3 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package org.firstinspires.ftc.team7234;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -38,18 +9,23 @@ import com.qualcomm.robotcore.util.Range;
 public class BotmanTeleOp extends OpMode{
 
     /* Declare OpMode members. */
-    HardwareBotman robot       = new HardwareBotman();
+    private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
     //Declares the power scaling of the robot
     private static final double driveCurve = 1.0;
+    private static final double extensionPow = 0.5;
     private double driveMultiplier = 1.0;
+    private double armPower = 0;
     private boolean isMecanum;
 
     private boolean mecanumToggle;
-    private boolean gripperClosed;
     private boolean gripperToggle;
     private boolean speedControl;
     private boolean speedToggle;
+
+
+    private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
+
     //endregion
 
     @Override
@@ -60,7 +36,6 @@ public class BotmanTeleOp extends OpMode{
         //Controlling Booleans
         isMecanum = true;
         speedControl = false;
-        gripperClosed = true;
 
         //Toggle Booleans
         mecanumToggle = true;
@@ -68,6 +43,8 @@ public class BotmanTeleOp extends OpMode{
         speedToggle = true;
 
         //endregion
+
+
 
     }
     @Override
@@ -77,6 +54,9 @@ public class BotmanTeleOp extends OpMode{
     @Override
     public void loop() {
         //region Drive Variables
+
+        //region Values
+        driveMultiplier = speedControl ? 0.5 : 1;
 
         //calculates angle in radians based on joystick position, reports in range [-Pi/2, 3Pi/2]
         double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
@@ -92,9 +72,19 @@ public class BotmanTeleOp extends OpMode{
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
         //Variable for arm control
-        double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+
+        armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+
+        double relicPower = (gamepad2.x) ? gamepad2.left_stick_y : 0;
+
+        if (robot.armLimit.getState() && armPower < 0){
+            armPower = 0;
+        }
+        //endregion
 
         //region Toggles
+
+        //region Mecanum Toggles
         if (mecanumToggle){ //Toggles drive mode based on the x button
             if (gamepad1.x){
                 isMecanum = !isMecanum;
@@ -104,18 +94,26 @@ public class BotmanTeleOp extends OpMode{
         else if (!gamepad1.x) {
             mecanumToggle = true;
         }
+        //endregion
 
-        //toggles gripper open/closed based on the gamepad 2 a button
+        //region Gripper Toggle
+        //cycles through gripper states, once for each button press
         if (gripperToggle){
             if (gamepad2.a){
-                gripperClosed = !gripperClosed;
+                gripState = gripState.next();
+                gripperToggle = false;
+            }
+            if (gamepad2.b){
+                gripState = gripState.previous();
                 gripperToggle = false;
             }
         }
-        else if (!gamepad2.a){
+        else if (!(gamepad2.a || gamepad2.b) ){
             gripperToggle = true;
         }
+        //endregion
 
+        //region Speed Toggle
         if (speedToggle){
             if(gamepad1.b){
                 speedControl = !speedControl;
@@ -126,11 +124,13 @@ public class BotmanTeleOp extends OpMode{
             speedToggle = true;
         }
         //endregion
-        driveMultiplier = speedControl ? 0.5 : 1;
 
+        //endregion
         //endregion
 
         //region Robot Control
+
+
         //Sends Power to the Robot Arm
         robot.arm.setPower(armPower);
         //Drives the robot
@@ -154,21 +154,18 @@ public class BotmanTeleOp extends OpMode{
         }
 
         //endregion
+
         //region Gripper Control
-
-
-        if (!gripperClosed){
-            robot.gripperOpen();
-        }
-        else{
-            robot.gripperClose();
-        }
-
+        robot.gripperSet(gripState);
         //endregion
+        //region Relic Control
+        robot.relicArm.setPower(relicPower);
+        //endregion
+
         //region Telemetry
 
         telemetry.addData("isMecanum: ", isMecanum);
-        telemetry.addData("gripperClosed: ", gripperClosed);
+        telemetry.addData("gripperState: ", gripState);
         telemetry.addData("Speed Limited to: ", driveMultiplier);
         telemetry.addLine();
         telemetry.addData("Angle: ", angle);

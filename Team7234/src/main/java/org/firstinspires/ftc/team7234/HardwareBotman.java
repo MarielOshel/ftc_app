@@ -1,38 +1,11 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package org.firstinspires.ftc.team7234;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.configuration.ExpansionHubMotorControllerPositionParams;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -47,29 +20,59 @@ import com.qualcomm.robotcore.util.Range;
 public class HardwareBotman
 {
     //region Public OpMode members
-    /* Public OpMode members. */
-    public DcMotor  leftFrontDrive   = null;
-    public DcMotor  rightFrontDrive = null;
-    public DcMotor leftBackDrive = null;
-    public DcMotor rightBackDrive = null;
-    public DcMotor  arm     = null;
-    public Servo    leftClaw    = null;
-    public Servo    rightClaw   = null;
-    public Servo jewelPusher = null;
-    public ColorSensor jewelColorSensor = null;
-    public float hsvValues[] = {0F, 0F, 0F};
+
+    DcMotor leftFrontDrive   = null;
+    DcMotor rightFrontDrive = null;
+    DcMotor leftBackDrive = null;
+    DcMotor rightBackDrive = null;
+    DcMotor arm     = null;
+    DcMotor relicArm = null;
+    Servo   leftClaw    = null;
+    Servo   rightClaw   = null;
+    Servo   jewelPusher = null;
+
+    DigitalChannel armLimit = null;
+
+    ColorSensor jewelColorSensor = null;
+    //endregion
+
+
+    //region Values
+    float hsvValues[] = {0F, 0F, 0F};
 
     public static final double MID_SERVO       =  0.5 ;
-    public static final double RIGHT_GRIPPER_OPEN    =  1 ;
-    public static final double LEFT_GRIPPER_OPEN  = 0 ;
-    public static final double RIGHT_GRIPPER_CLOSED    =  0 ;
-    public static final double LEFT_GRIPPER_CLOSED  = 1;
-    public static final double JEWEL_PUSHER_UP = 0.35; //TODO: Find Jewel Pusher Values
-    public static final double JEWEL_PUSHER_DOWN = 0.92;
+
+    private static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    private static final double LEFT_GRIPPER_OPEN  = 1 ;
+
+    private static final double RIGHT_GRIPPER_HALF = 0.7;
+    private static final double LEFT_GRIPPER_HALF = 0.3;
+
+    private static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    private static final double LEFT_GRIPPER_CLOSED  = 0;
+
+    static final double JEWEL_PUSHER_UP = 0.35;
+    static final double JEWEL_PUSHER_DOWN = 0.95;
+    //endregion
 
     //Establishes variables for motors
     double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
     DcMotor[] driveMotors;
+
+    public enum GripperState{
+        OPEN,
+        HALFWAY,
+        CLOSED;
+
+        private static GripperState[] vals = values();
+
+        public GripperState next(){  //Code from https://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
+            return vals[(this.ordinal()+1) % vals.length];
+        }
+        public GripperState previous(){
+            return vals[(this.ordinal()-1) % vals.length];
+        }
+    }
 
     /* local OpMode members. */
     private HardwareMap hwMap           =  null;
@@ -89,6 +92,8 @@ public class HardwareBotman
         leftBackDrive = hwMap.get(DcMotor.class, "left Back Drive");
         rightBackDrive = hwMap.get(DcMotor.class, "right Back Drive");
         arm    = hwMap.get(DcMotor.class, "arm");
+        relicArm = hwMap.get(DcMotor.class, "relicArm"); //TODO: Check Hardware Map on robot
+
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -122,12 +127,36 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
+
+        //Define sensors
         jewelColorSensor = hwMap.get(ColorSensor.class, "jewelColorSensor");
+        armLimit = hwMap.get(DigitalChannel.class, "armLimiter");
 
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
     }
 
-    //Gripper Control
+
+    //region Gripper Control
+
+    void gripperSet(GripperState state){
+        switch (state){
+            case OPEN:
+                leftClaw.setPosition(LEFT_GRIPPER_OPEN);
+                rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
+                break;
+            case HALFWAY:
+                leftClaw.setPosition(LEFT_GRIPPER_HALF);
+                rightClaw.setPosition(RIGHT_GRIPPER_HALF);
+                break;
+            case CLOSED:
+                leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
+                rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
+                break;
+            default: throw new IllegalArgumentException("GripperState contains an unexpected value. I'm not even sure how you managed this.");
+        }
+    }
+
+    /* Old code no longer used
     void gripperOpen() {
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
@@ -136,6 +165,16 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
         rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
     }
+
+    */
+
+    //endregion
+
+    //region Relic Arm Control
+    public void extendRelicArm(){
+
+    }
+    //endregion
 
     //region Robot Driving
     void arrayDrive(double lf, double rf, double lb, double rb){
