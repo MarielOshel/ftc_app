@@ -17,13 +17,11 @@ public class BotmanTeleOp extends OpMode{
     private double driveMultiplier = 1.0;
     private double armPower = 0;
     private boolean isMecanum;
-    private boolean relicExtending;
 
     private boolean mecanumToggle;
     private boolean gripperToggle;
     private boolean speedControl;
     private boolean speedToggle;
-    private boolean relicToggle;
 
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
@@ -38,13 +36,11 @@ public class BotmanTeleOp extends OpMode{
         //Controlling Booleans
         isMecanum = true;
         speedControl = false;
-        relicExtending = false;
 
         //Toggle Booleans
         mecanumToggle = true;
         gripperToggle = true;
         speedToggle = true;
-        relicToggle = true;
 
         //endregion
 
@@ -59,6 +55,7 @@ public class BotmanTeleOp extends OpMode{
     public void loop() {
         //region Drive Variables
 
+        //region Values
         driveMultiplier = speedControl ? 0.5 : 1;
 
         //calculates angle in radians based on joystick position, reports in range [-Pi/2, 3Pi/2]
@@ -78,9 +75,12 @@ public class BotmanTeleOp extends OpMode{
 
         armPower = gamepad2.left_trigger - gamepad2.right_trigger;
 
+        double relicPower = (gamepad2.x) ? gamepad2.left_stick_y : 0;
+
         if (robot.armLimit.getState() && armPower < 0){
             armPower = 0;
         }
+        //endregion
 
         //region Toggles
 
@@ -112,16 +112,6 @@ public class BotmanTeleOp extends OpMode{
             gripperToggle = true;
         }
         //endregion
-
-        if (relicToggle){
-            if (gamepad2.x){
-                relicExtending = !relicExtending;
-                relicToggle = false;
-            }
-        }
-        else if (!gamepad2.x){
-            relicToggle = true;
-        }
 
         //region Speed Toggle
         if (speedToggle){
@@ -169,8 +159,7 @@ public class BotmanTeleOp extends OpMode{
         robot.gripperSet(gripState);
         //endregion
         //region Relic Control
-        double relicPow = (relicExtending) ? extensionPow : 0;
-        robot.relicArm.setPower(relicPow);
+        robot.relicArm.setPower(relicPower);
         //endregion
 
         //region Telemetry
