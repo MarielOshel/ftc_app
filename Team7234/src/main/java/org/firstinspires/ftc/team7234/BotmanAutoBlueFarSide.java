@@ -226,7 +226,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
-                    robot.arrayDrive(0,0,0,0,);
+                    robot.arrayDrive(0,0,0,0);
                 }
                 break;
         }
