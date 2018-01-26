@@ -62,7 +62,8 @@ public class BotmanAutoBlueFarSide extends OpMode {
         MOVE,
         MOVE_RIGHT,
         LEFT, CENTER, RIGHT,
-        SCORE
+        SCORE,
+        BACKUP
     }
 
     //This initializes our robot through our hardware map as well as
@@ -106,9 +107,17 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             //All this case does is show us some telemetry of what the camera picks up
             case KEY:
+                if(robot.armLimit.getState()){
+                    telemetry.addData("We are seeing", keyFinder);
+                    robot.leftClaw.setPosition(robot.LEFT_GRIPPER_CLOSED);
+                    robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_CLOSED);
+                    robot.arm.setPower(0.2);
+                }
 
-                telemetry.addData("We are seeing", keyFinder);
-                programState = currentState.JEWELS;
+                else{
+                    robot.arm.setPower(0);
+                    programState = currentState.JEWELS;
+                }
                 break;
 
             //This case detects the color of the jewel and switches cases accordingly
@@ -132,22 +141,21 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             //This case twists the robot forward and then returns it to its original position
             case TWIST_FORWARD:
-                if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-1)){
+                if(robot.heading() >= -30){
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
-                else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(0)){
+                else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                     programState = currentState.MOVE;
                 }
                 break;
 
             //This case twists the robot backward and then returns it to its original position
             case TWIST_BACKWARD:
-                if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
+                if(robot.heading() <= 10){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-5 )){
+                else if (robot.heading() >= -30){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                     programState = currentState.MOVE;
@@ -157,8 +165,11 @@ public class BotmanAutoBlueFarSide extends OpMode {
             //This case simply moves the robot forward 8 inches
             case MOVE:
                 robot.arrayDrive(0,0,0,0);
-                if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(8)){
+                robot.resetEncoders();
+                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
+                }
+                else{
                     programState = currentState.MOVE_RIGHT;
                 }
                 break; //remove after testing
@@ -183,6 +194,8 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 break;*/
             case MOVE_RIGHT:
                 robot.arrayDrive(0,0,0,0);
+                programState = currentState.SCORE;
+                break;
 
             /*case LEFT:
 
@@ -190,11 +203,32 @@ public class BotmanAutoBlueFarSide extends OpMode {
             case CENTER:
 
 
-            case RIGHT:
+            case RIGHT:*/
 
 
             case SCORE:
-                //Score glyph*/
+                robot.leftClaw.setPosition(robot.LEFT_GRIPPER_OPEN);
+                robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
+
+                robot.arrayDrive(0,0,0,0);
+                robot.resetEncoders();
+                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
+                    robot.arrayDrive(0.5,0.5,0.5,0.5);
+                }
+                else{
+                    programState = currentState.BACKUP;
+                }
+
+                break;
+
+            case BACKUP:
+                if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-2)){
+                    robot.arrayDrive(0.5,0.5,0.5,0.5);
+                }
+                else{
+                    robot.arrayDrive(0,0,0,0);
+                }
+                break;
         }
 
 
