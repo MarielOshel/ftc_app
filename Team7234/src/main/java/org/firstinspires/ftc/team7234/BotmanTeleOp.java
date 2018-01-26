@@ -172,6 +172,8 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("Magnitude: ", magnitude);
         telemetry.addData("Rotation: ", rotation);
         telemetry.addLine();
+        telemetry.addData("Relic Power: ", relicPower);
+        telemetry.addLine();
         telemetry.addData("X: ", gamepad1.left_stick_x);
         telemetry.addData("Y: ", gamepad1.left_stick_y);
         telemetry.addLine();
