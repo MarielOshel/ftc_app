@@ -37,6 +37,7 @@ public class HardwareBotman
     Servo   leftClaw    = null;
     Servo   rightClaw   = null;
     Servo   jewelPusher = null;
+    Servo   relicClaw = null;
 
     DigitalChannel armLimit = null;
 
@@ -52,17 +53,21 @@ public class HardwareBotman
 
     public static final double MID_SERVO       =  0.5 ;
 
-    public static final double RIGHT_GRIPPER_OPEN    =  0 ;
-    public static final double LEFT_GRIPPER_OPEN  = 1 ;
+    static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    static final double LEFT_GRIPPER_OPEN  = 1 ;
 
     private static final double RIGHT_GRIPPER_HALF = 0.7;
     private static final double LEFT_GRIPPER_HALF = 0.3;
 
-    public static final double RIGHT_GRIPPER_CLOSED    =  1 ;
-    public static final double LEFT_GRIPPER_CLOSED  = 0;
+    static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    static final double LEFT_GRIPPER_CLOSED  = 0;
 
     static final double JEWEL_PUSHER_UP = 0.35;
     static final double JEWEL_PUSHER_DOWN = 0.95;
+
+    static final double RELIC_ARM_TOP = 0.05;
+    static final double RELIC_ARM_BOTTOM = 1.0;
+
     //endregion
 
     //Establishes variables for motors
@@ -134,9 +139,15 @@ public class HardwareBotman
         leftClaw  = hwMap.get(Servo.class, "leftClaw");
         rightClaw = hwMap.get(Servo.class, "rightClaw");
         jewelPusher = hwMap.get(Servo.class, "jewelPusher");
+        relicClaw = hwMap.get(Servo.class, "relicClaw");
+
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
+        relicClaw.scaleRange(RELIC_ARM_TOP, RELIC_ARM_BOTTOM);
+        relicClaw.setPosition(0.0);
+
+
 
         //Define sensors
         jewelColorSensor = hwMap.get(ColorSensor.class, "jewelColorSensor");

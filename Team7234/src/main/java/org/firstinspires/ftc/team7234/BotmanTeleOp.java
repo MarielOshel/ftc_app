@@ -16,6 +16,9 @@ public class BotmanTeleOp extends OpMode{
     private static final double extensionPow = 0.5;
     private double driveMultiplier = 1.0;
     private double armPower = 0;
+    private double relicIncrementing = 0;
+    private double relicPos;
+
     private boolean isMecanum;
 
     private boolean mecanumToggle;
@@ -43,9 +46,7 @@ public class BotmanTeleOp extends OpMode{
         speedToggle = true;
 
         //endregion
-
-
-
+        relicPos = robot.relicClaw.getPosition();
     }
     @Override
     public void init_loop(){}
@@ -71,16 +72,32 @@ public class BotmanTeleOp extends OpMode{
         //Variables for tank drive
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
-        //Variable for arm control
 
-        armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+
+
 
         double relicPower = (gamepad2.x) ? gamepad2.left_stick_y : 0;
 
         if (robot.armLimit.getState() && armPower < 0){
             armPower = 0;
         }
+        else {
+            armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+        }
         //endregion
+
+        relicIncrementing = gamepad2.right_stick_y / 1000.0;
+
+        if (relicPos + relicIncrementing > 1.0){
+            relicPos = 1.0;
+        }
+        else if (relicPos + relicIncrementing < 0.0){
+            relicPos = 0.0;
+        }
+        else{
+            relicPos += relicIncrementing;
+        }
+        robot.relicClaw.setPosition(relicPos);
 
         //region Toggles
 
@@ -124,17 +141,15 @@ public class BotmanTeleOp extends OpMode{
             speedToggle = true;
         }
         //endregion
-
         //endregion
         //endregion
 
         //region Robot Control
 
-
         //Sends Power to the Robot Arm
         robot.arm.setPower(armPower);
-        //Drives the robot
 
+        //Drives the robot
         if (isMecanum){
             robot.mecanumDrive(angle, magnitude, rotation); //Drives Omnidirectionally
         }
@@ -173,6 +188,7 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("Rotation: ", rotation);
         telemetry.addLine();
         telemetry.addData("Relic Power: ", relicPower);
+        telemetry.addData("Relic Position: ", relicPos);
         telemetry.addLine();
         telemetry.addData("X: ", gamepad1.left_stick_x);
         telemetry.addData("Y: ", gamepad1.left_stick_y);

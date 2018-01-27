@@ -222,6 +222,8 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 break;
 
             case BACKUP:
+                robot.arrayDrive(0,0,0,0);
+                robot.resetEncoders();
                 if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-2)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
