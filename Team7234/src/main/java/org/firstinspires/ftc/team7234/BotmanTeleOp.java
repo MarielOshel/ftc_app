@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team7234;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="BotmanTeleOp", group="Pushbot")
@@ -34,6 +35,7 @@ public class BotmanTeleOp extends OpMode{
     @Override
     public void init() {
         robot.init(hardwareMap, false);
+        robot.setMotorFloatMode(DcMotor.ZeroPowerBehavior.BRAKE);
         //region Boolean Initialization
 
         //Controlling Booleans
@@ -46,6 +48,8 @@ public class BotmanTeleOp extends OpMode{
         speedToggle = true;
 
         //endregion
+
+
         relicPos = robot.relicClaw.getPosition();
     }
     @Override
@@ -76,7 +80,7 @@ public class BotmanTeleOp extends OpMode{
 
 
 
-        double relicPower = (gamepad2.x) ? gamepad2.left_stick_y : 0;
+        double relicPower = (gamepad2.x) ? Range.clip(gamepad2.left_stick_y, -1.0, 1) : 0;
 
         if (robot.armLimit.getState() && armPower < 0){
             armPower = 0;
@@ -86,7 +90,8 @@ public class BotmanTeleOp extends OpMode{
         }
         //endregion
 
-        relicIncrementing = gamepad2.right_stick_y / 1000.0;
+        //region Relic Claw
+        relicIncrementing = gamepad2.right_stick_y / 500.0;
 
         if (relicPos + relicIncrementing > 1.0){
             relicPos = 1.0;
@@ -98,6 +103,7 @@ public class BotmanTeleOp extends OpMode{
             relicPos += relicIncrementing;
         }
         robot.relicClaw.setPosition(relicPos);
+        //endregion
 
         //region Toggles
 

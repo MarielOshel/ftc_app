@@ -65,7 +65,7 @@ public class HardwareBotman
     static final double JEWEL_PUSHER_UP = 0.35;
     static final double JEWEL_PUSHER_DOWN = 0.95;
 
-    static final double RELIC_ARM_TOP = 0.05;
+    static final double RELIC_ARM_TOP = 0.02;
     static final double RELIC_ARM_BOTTOM = 1.0;
 
     //endregion
@@ -85,7 +85,8 @@ public class HardwareBotman
             return vals[(this.ordinal()+1) % vals.length];
         }
         public GripperState previous(){
-            return vals[(this.ordinal()-1) % vals.length];
+            int n = (this.ordinal()-1 % vals.length < 0) ? vals.length-1 : this.ordinal()-1 % vals.length;
+            return vals[n];
         }
     }
 
@@ -164,6 +165,12 @@ public class HardwareBotman
         // and named "imu".
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+    }
+
+    void setMotorFloatMode(DcMotor.ZeroPowerBehavior behavior){
+        for (int i=0; i < 4; i++){
+            driveMotors[i].setZeroPowerBehavior(behavior);
+        }
     }
 
     double heading(){
@@ -283,10 +290,10 @@ public class HardwareBotman
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
