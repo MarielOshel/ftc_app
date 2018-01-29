@@ -39,7 +39,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 public class RelicVuMarkBotIdentification extends OpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";
-    private OpenGLMatrix pose = null;
+    //private OpenGLMatrix pose = null;
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
     RelicVuMarkBot robot = new RelicVuMarkBot();

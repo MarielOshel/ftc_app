@@ -39,21 +39,25 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 
 /**
- * Demonstrates how to setup and use 2 MR color sensors
+ * Demonstrates how to setup and use 1 MR color sensor
  */
 @Autonomous(name = "Read MR Color Sensor with HSV", group = "Example")
 //@Disabled
 public class Example1ColorSensor extends OpMode {
 
     ColorSensor colorSensor;
+    //Array to hold the HSV values
     float hsvValues[] = {0F,0F,0F};
 
     @Override
     public void init() {
         colorSensor = hardwareMap.colorSensor.get("colorsensor");
-
+        //This can be used to use a different address for the MR Color Sensor
+        //It comes from the factory with 0x3C, but if you want to more than one
+        //you need ot change the reference address on one of them.
         colorSensor.setI2cAddress(I2cAddr.create8bit(0x3C));
-
+        //This command is used to turn the color sensor LED on and off.  In this
+        //statement the LED is turned off.
         colorSensor.enableLed(false);
 
         telemetry.addData("Status", "Initialized");
@@ -70,8 +74,13 @@ public class Example1ColorSensor extends OpMode {
 
     @Override
     public void loop() {
-        if(gamepad1.a) {colorSensor.enableLed(false);} else {colorSensor.enableLed(true);}
-
+        //Pressing "A" on gamepad 1 will turn the LED off.  When not pressed it will be on.
+        if(gamepad1.a) {
+            colorSensor.enableLed(false);
+        } else {
+            colorSensor.enableLed(true);
+        }
+        //Ths Java method will convert RGB values to HSV.  The values need to multiplied by 8 to have the correct input range
         Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
 
         telemetry.addData("0", "Press A on Gamepad1 to turn off LED");
