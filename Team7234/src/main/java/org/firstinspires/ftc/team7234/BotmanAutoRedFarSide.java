@@ -34,43 +34,38 @@ package org.firstinspires.ftc.team7234;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.team7234.RelicVuMarkIdentification2;
-import org.firstinspires.ftc.team7234.HardwareBotman;
-
-import static com.sun.tools.javac.util.Constants.format;
 
 /**
  * Demonstrates empty OpMode
  */
-@Autonomous(name = "Botman Auto Test", group = "Example")
+@Autonomous(name = "Botman Auto Red Far", group = "Example")
 //@Disabled
-public class BotmanAutoSkeleton extends OpMode {
+public class BotmanAutoRedFarSide extends OpMode {
 
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
+    public RelicRecoveryVuMark keyFinder;
     HardwareBotman robot = new HardwareBotman();
-    RelicRecoveryVuMark keyFinder;
+
 
     currentState programState = currentState.KEY;
     public enum currentState {
         KEY,
         JEWELS,
+        TWIST_FORWARD, TWIST_BACKWARD,
         MOVE,
-        TURN_AND_ADJUST,
+        LEFT, CENTER, RIGHT,
         SCORE
     }
-
+//Swag 420 blaze it
     @Override
     public void init() {
         robot.init(hardwareMap, true);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
-
 
 
     @Override
@@ -94,50 +89,86 @@ public class BotmanAutoSkeleton extends OpMode {
             telemetry.addData("VuMark", "not visible");
         }
         relicVuMark.vuMark = RelicRecoveryVuMark.from(relicVuMark.relicTemplate);
+        telemetry.addData("Hue:", robot.hsvValues[0]);
+        telemetry.addData("Saturation:", robot.hsvValues[1]);
+        telemetry.addData("Value:", robot.hsvValues[2]);
         switch (programState) {
 
             case KEY:
 
                 telemetry.addData("We are seeing", keyFinder);
-                programState = currentState.JEWELS;
+                if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(1)){
+                    robot.arrayDrive(-0.25,0.25,0.25,-0.25);
+                    programState = currentState.JEWELS;
+                }
                 break;
 
             case JEWELS:
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
-                if(210 < robot.hsvValues[0] || 240 > robot.hsvValues[0]){
-                    //move according to blue having been found
+                robot.jewelPusher.setPosition(1);
+                telemetry.addData("Encoder count", robot.leftBackDrive.getCurrentPosition());
+
+                if((robot.hsvValues[0] > 180 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
+                    programState = currentState.TWIST_BACKWARD;
+                }
+                else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
+                    programState = currentState.TWIST_FORWARD;
+                }
+                break;
+
+            case TWIST_FORWARD:
+                if(robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-1)){
+                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
+                }
+                else if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(5)){
+                    robot.jewelPusher.setPosition(.3);
+                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                     programState = currentState.MOVE;
                 }
-                else if(robot.hsvValues[0] > 345 || robot.hsvValues[0] < 15) {
-                    //move according to red having been found
+                break;
+
+            case TWIST_BACKWARD:
+                if(robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(1)){
+                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
+                }
+                else if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(0 )){
+                    robot.jewelPusher.setPosition(.3);
+                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                     programState = currentState.MOVE;
                 }
-                telemetry.addData("HSV is", robot.hsvValues);
                 break;
 
             case MOVE:
-                if (robot.leftBackDrive.getCurrentPosition() < Math.abs(robot.ticsPerInch(12))){
+                robot.arrayDrive(0,0,0,0);
+                break; //remove after testing
+                /*
+                robot.arrayDrive(1, 1, 1, 1);
 
+                if (robot.leftBackDrive.getCurrentPosition() >= Math.abs(robot.ticsPerInch(12))){
+                    robot.MecanumDrive(0, 0, 0);
                 }
                 else{
-                    programState = currentState.TURN_AND_ADJUST;
+                    robot.resetEncoders();
+                    if (keyFinder.equals("L")){
+                        programState = currentState.LEFT;
+                    }
+                    else if (keyFinder.equals("C")){
+                        programState = currentState.CENTER;
+                    }
+                    else if (keyFinder.equals("R")){
+                        programState = currentState.RIGHT;
+                    }
                 }
                 break;
 
-            /*case TURN_AND_ADJUST:
-                if(){
-                    //Line up for left
-                }
-                if(){
-                    //Line up for center
-                }
-                if(){
-                    //Line up for right
-                }
-                else{
-                    //something
-                }
-                break;
+            /*case LEFT:
+
+
+            case CENTER:
+
+
+            case RIGHT:
+
 
             case SCORE:
                 //Score glyph*/

@@ -64,7 +64,7 @@ public class BotmanAutoRedClose extends OpMode {
 
     @Override
     public void init() {
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, true);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
@@ -97,7 +97,7 @@ public class BotmanAutoRedClose extends OpMode {
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
                 telemetry.addData("HSV is", robot.hsvValues );
 
-                if (robot.hsvValues = );
+                if (robot.hsvValues[0] == 0);
 
                 else
 
