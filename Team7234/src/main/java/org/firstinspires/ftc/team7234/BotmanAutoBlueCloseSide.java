@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.team7234;
 //This imports all of the necessary modules and the like that are needed for this program
+
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -38,16 +39,15 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-import static com.sun.tools.javac.util.Constants.format;
 
-
-@Autonomous(name = "Botman Auto Red Far", group = "Example")
+@Autonomous(name = "Botman Auto Blue Close", group = "Example")
 //@Disabled
-public class BotmanAutoRedFarSide extends OpMode {
+public class BotmanAutoBlueCloseSide extends OpMode {
 
     //Sets up classes and variables for later use
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
+    public double target;
     HardwareBotman robot = new HardwareBotman();
 
 
@@ -59,8 +59,7 @@ public class BotmanAutoRedFarSide extends OpMode {
         KEY,
         JEWELS,
         TWIST_FORWARD, TWIST_BACKWARD,
-        TURN_AROUND,
-        OTHER_MOVE,
+        FIX,
         MOVE,
         MOVE_RIGHT,
         LEFT, CENTER, RIGHT,
@@ -133,50 +132,53 @@ public class BotmanAutoRedFarSide extends OpMode {
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
-                    programState = currentState.TWIST_FORWARD;
+                    programState = currentState.TWIST_BACKWARD;
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
-                    programState = currentState.TWIST_BACKWARD;
+                    programState = currentState.TWIST_FORWARD;
                 }
                 break;
 
             //This case twists the robot forward and then returns it to its original position
             case TWIST_FORWARD:
-                if(robot.heading() >= 0){
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
+                if(robot.heading() >= -5){
+                    robot.arrayDrive(0.2, -0.2, 0.2, -0.2);
                 }
                 else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    programState = currentState.OTHER_MOVE;
+                    programState = currentState.MOVE;
                 }
                 break;
 
             //This case twists the robot backward and then returns it to its original position
             case TWIST_BACKWARD:
-                if(robot.heading() <= 10){
-                    robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
+                if(robot.heading() <= 5){
+                    robot.arrayDrive(-0.2, 0.2, -0.2, 0.2);
                 }
-                else if (robot.heading() >= 0){
+                else {
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
-                    programState = currentState.OTHER_MOVE;
+                    programState = currentState.FIX;
                 }
                 break;
-
-            case OTHER_MOVE:
-                if(robot.heading() <= 180){
-                    robot.arrayDrive(0.3,-0.3,0.3,-0.3);
+            case FIX:
+                if (robot.heading() >= 2){
+                    robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    robot.arrayDrive(0.2, -0.2, 0.2, -0.2);
                 }
+                else if(robot.heading() <= -2){
+                    robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    robot.arrayDrive(-0.2, 0.2, -0.2, 0.2);
+            }
                 else{
+                    target = robot.leftBackDrive.getCurrentPosition() - robot.ticsPerInch(36);
                     programState = currentState.MOVE;
                 }
-            //This case simply moves the robot forward 8 inches
+                    break;
+                //This case simply moves the robot forward 8 inches
             case MOVE:
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
-                    robot.arrayDrive(0.5,0.5,0.5,0.5);
+                if(robot.leftBackDrive.getCurrentPosition() > target) {
+                    robot.driveByGyro(0.3);
                 }
                 else{
                     programState = currentState.MOVE_RIGHT;
@@ -203,7 +205,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;*/
             case MOVE_RIGHT:
                 robot.arrayDrive(0,0,0,0);
-                programState = currentState.SCORE;
+                //programState = currentState.SCORE;
                 break;
 
             /*case LEFT:

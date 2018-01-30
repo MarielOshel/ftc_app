@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team7234;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -9,6 +11,11 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.configuration.ExpansionHubMotorControllerPositionParams;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /**
  * Team 7234
@@ -30,10 +37,14 @@ public class HardwareBotman
     Servo   leftClaw    = null;
     Servo   rightClaw   = null;
     Servo   jewelPusher = null;
+    Servo   relicClaw = null;
 
     DigitalChannel armLimit = null;
 
     ColorSensor jewelColorSensor = null;
+
+    BNO055IMU imu;
+    Orientation angles;
     //endregion
 
 
@@ -42,17 +53,21 @@ public class HardwareBotman
 
     public static final double MID_SERVO       =  0.5 ;
 
-    private static final double RIGHT_GRIPPER_OPEN    =  0 ;
-    private static final double LEFT_GRIPPER_OPEN  = 1 ;
+    static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    static final double LEFT_GRIPPER_OPEN  = 1 ;
 
     private static final double RIGHT_GRIPPER_HALF = 0.7;
     private static final double LEFT_GRIPPER_HALF = 0.3;
 
-    private static final double RIGHT_GRIPPER_CLOSED    =  1 ;
-    private static final double LEFT_GRIPPER_CLOSED  = 0;
+    static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    static final double LEFT_GRIPPER_CLOSED  = 0;
 
-    static final double JEWEL_PUSHER_UP = 0.35;
-    static final double JEWEL_PUSHER_DOWN = 0.95;
+    static final double JEWEL_PUSHER_UP = 0.32;
+    static final double JEWEL_PUSHER_DOWN = 1;
+
+    static final double RELIC_ARM_TOP = 0.02;
+    static final double RELIC_ARM_BOTTOM = 1.0;
+
     //endregion
 
     //Establishes variables for motors
@@ -70,7 +85,8 @@ public class HardwareBotman
             return vals[(this.ordinal()+1) % vals.length];
         }
         public GripperState previous(){
-            return vals[(this.ordinal()-1) % vals.length];
+            int n = (this.ordinal()-1 % vals.length < 0) ? vals.length-1 : this.ordinal()-1 % vals.length;
+            return vals[n];
         }
     }
 
@@ -124,15 +140,42 @@ public class HardwareBotman
         leftClaw  = hwMap.get(Servo.class, "leftClaw");
         rightClaw = hwMap.get(Servo.class, "rightClaw");
         jewelPusher = hwMap.get(Servo.class, "jewelPusher");
+        relicClaw = hwMap.get(Servo.class, "relicClaw");
+
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
+        relicClaw.scaleRange(RELIC_ARM_TOP, RELIC_ARM_BOTTOM);
+        relicClaw.setPosition(0.0);
+
+
 
         //Define sensors
         jewelColorSensor = hwMap.get(ColorSensor.class, "jewelColorSensor");
         armLimit = hwMap.get(DigitalChannel.class, "armLimiter");
 
         driveMotors  = new DcMotor[] {leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive};
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+    }
+
+    void setMotorFloatMode(DcMotor.ZeroPowerBehavior behavior){
+        for (int i=0; i < 4; i++){
+            driveMotors[i].setZeroPowerBehavior(behavior);
+        }
+    }
+
+    double heading(){
+        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
     }
 
 
@@ -234,6 +277,18 @@ public class HardwareBotman
             output = max;
         }
         return output;
+    }
+
+    void driveByGyro(double speed){
+        if(speed > 0.9) {
+            speed = 0.89;
+        }
+        if (heading() > 0) {
+            arrayDrive(speed + 0.1, speed, speed + 0.1, speed);
+        } else if (heading() < 0) {
+            arrayDrive(speed, speed + 0.1, speed, speed + 0.1);
+        }
+
     }
 
     double ticsPerInch(double distance){
