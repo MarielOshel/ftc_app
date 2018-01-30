@@ -13,20 +13,27 @@ public class BotmanTeleOp extends OpMode{
     private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
     //Declares the power scaling of the robot
+
     private static final double driveCurve = 1.0;
     private static final double extensionPow = 0.5;
     private double driveMultiplier = 1.0;
     private double armPower = 0;
     private double relicIncrementing = 0;
     private double relicPos;
+    private double headingLock;
 
     private boolean isMecanum;
+    private boolean orientationLock;
+    private boolean speedControl;
 
     private boolean mecanumToggle;
     private boolean gripperToggle;
-    private boolean speedControl;
     private boolean speedToggle;
+    private boolean orientationToggle;
 
+    double magnitude;
+    double rotation;
+    double angle;
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
 
@@ -41,15 +48,15 @@ public class BotmanTeleOp extends OpMode{
         //Controlling Booleans
         isMecanum = true;
         speedControl = false;
+        orientationLock = false;
 
         //Toggle Booleans
         mecanumToggle = true;
         gripperToggle = true;
         speedToggle = true;
+        orientationToggle = true;
 
         //endregion
-
-
         relicPos = robot.relicClaw.getPosition();
     }
     @Override
@@ -58,27 +65,33 @@ public class BotmanTeleOp extends OpMode{
     public void start(){}
     @Override
     public void loop() {
-        //region Drive Variables
-
         //region Values
         driveMultiplier = speedControl ? 0.5 : 1;
 
         //calculates angle in radians based on joystick position, reports in range [-Pi/2, 3Pi/2]
-        double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
+        angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
         if (Double.isNaN(angle)){
             angle = 0;              //Prevents NaN error later in the Program
         }
         //calculates robot speed from the joystick's distance from the center
-        double magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
+        magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
         // How much the robot should turn while moving in that direction
-        double rotation = driveMultiplier*Range.clip(gamepad1.right_stick_x, -1, 1);
+        if(orientationLock){
+            if (robot.heading() < headingLock){
+                rotation = 0.1;
+            }
+            else if (robot.heading() > headingLock){
+                rotation = -0.1;
+            }
+            //TODO: Add code to lock the orientation
+        }
+        else{
+            rotation = driveMultiplier* Range.clip(gamepad1.right_stick_x, -1, 1);
+        }
 
         //Variables for tank drive
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
-
-
-
 
         double relicPower = (gamepad2.x) ? Range.clip(gamepad2.left_stick_y, -1.0, 1) : 0;
 
@@ -89,7 +102,6 @@ public class BotmanTeleOp extends OpMode{
             armPower = gamepad2.left_trigger - gamepad2.right_trigger;
         }
         //endregion
-
         //region Relic Claw
         relicIncrementing = gamepad2.right_stick_y / 500.0;
 
@@ -104,7 +116,6 @@ public class BotmanTeleOp extends OpMode{
         }
         robot.relicClaw.setPosition(relicPos);
         //endregion
-
         //region Toggles
 
         //region Mecanum Toggles
@@ -147,9 +158,20 @@ public class BotmanTeleOp extends OpMode{
             speedToggle = true;
         }
         //endregion
-        //endregion
-        //endregion
 
+        //region Orientation Lock
+        if (orientationToggle){
+            if (gamepad1.left_stick_button){
+                orientationLock = !orientationLock;
+                headingLock = robot.heading();
+                orientationToggle = false;
+            }
+        }
+        else if (!gamepad1.left_stick_button){
+            orientationToggle = true;
+        }
+        //endregion
+        //endregion
         //region Robot Control
 
         //Sends Power to the Robot Arm
@@ -175,14 +197,12 @@ public class BotmanTeleOp extends OpMode{
         }
 
         //endregion
-
         //region Gripper Control
         robot.gripperSet(gripState);
         //endregion
         //region Relic Control
         robot.relicArm.setPower(relicPower);
         //endregion
-
         //region Telemetry
 
         telemetry.addData("isMecanum: ", isMecanum);
