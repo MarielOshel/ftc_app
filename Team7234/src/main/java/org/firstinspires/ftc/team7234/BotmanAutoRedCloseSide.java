@@ -41,9 +41,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import static com.sun.tools.javac.util.Constants.format;
 
 
-@Autonomous(name = "Botman Auto Red Far", group = "Example")
+@Autonomous(name = "Botman Auto Red Close", group = "Example")
 //@Disabled
-public class BotmanAutoRedFarSide extends OpMode {
+public class BotmanAutoRedCloseSide extends OpMode {
 
     //Sets up classes and variables for later use
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
@@ -171,16 +171,10 @@ public class BotmanAutoRedFarSide extends OpMode {
                 else{
                     programState = currentState.MOVE;
                 }
-            //This case simply moves the robot forward 8 inches
+                //This case simply moves the robot forward 8 inches
             case MOVE:
                 robot.arrayDrive(0,0,0,0);
                 robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
-                    robot.arrayDrive(0.5,0.5,0.5,0.5);
-                }
-                else{
-                    programState = currentState.MOVE_RIGHT;
-                }
                 break; //remove after testing
                 /*
                 robot.arrayDrive(1, 1, 1, 1);

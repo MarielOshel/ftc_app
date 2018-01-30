@@ -131,11 +131,11 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
-                    programState = currentState.TWIST_FORWARD;
+                    programState = currentState.TWIST_BACKWARD;
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
-                    programState = currentState.TWIST_BACKWARD;
+                    programState = currentState.TWIST_FORWARD;
                 }
                 break;
 

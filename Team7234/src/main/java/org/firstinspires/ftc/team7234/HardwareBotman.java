@@ -62,8 +62,8 @@ public class HardwareBotman
     static final double RIGHT_GRIPPER_CLOSED    =  1 ;
     static final double LEFT_GRIPPER_CLOSED  = 0;
 
-    static final double JEWEL_PUSHER_UP = 0.35;
-    static final double JEWEL_PUSHER_DOWN = 0.95;
+    static final double JEWEL_PUSHER_UP = 0.32;
+    static final double JEWEL_PUSHER_DOWN = 1;
 
     static final double RELIC_ARM_TOP = 0.02;
     static final double RELIC_ARM_BOTTOM = 1.0;
@@ -277,6 +277,18 @@ public class HardwareBotman
             output = max;
         }
         return output;
+    }
+
+    void driveByGyro(double speed){
+        if(speed > 0.9) {
+            speed = 0.89;
+        }
+        if (heading() > 0) {
+            arrayDrive(speed + 0.1, speed, speed + 0.1, speed);
+        } else if (heading() < 0) {
+            arrayDrive(speed, speed + 0.1, speed, speed + 0.1);
+        }
+
     }
 
     double ticsPerInch(double distance){
