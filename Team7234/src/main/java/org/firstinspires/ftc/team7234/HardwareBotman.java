@@ -261,6 +261,15 @@ public class HardwareBotman
         return output;
     }
 
+    void driveWithHeading(double speed){
+        if(heading() > 2){
+            arrayDrive(speed, speed - 0.1, speed, speed -0.1);
+        }
+        if(heading() < -2){
+            arrayDrive(speed - 0.1, speed, speed - 0.1, speed);
+        }
+    }
+
     double ticsPerInch(double distance){
         return (280/Math.PI) * distance;
     }
