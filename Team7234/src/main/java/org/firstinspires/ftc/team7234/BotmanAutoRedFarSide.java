@@ -59,17 +59,10 @@ public class BotmanAutoRedFarSide extends OpMode {
         KEY,
         JEWELS,
         TWIST_FORWARD, TWIST_BACKWARD,
-<<<<<<< HEAD
         TURN_AROUND,
         OTHER_MOVE,
         MOVE,
         MOVE_RIGHT,
-=======
-        ADJUST,
-        MOVE,
-        MOVE_RIGHT,
-        BACKUP,
->>>>>>> refs/remotes/Leo352/master
         LEFT, CENTER, RIGHT,
         SCORE,
         BACKUP
@@ -137,15 +130,10 @@ public class BotmanAutoRedFarSide extends OpMode {
                 robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_DOWN);
                 telemetry.addData("Encoder count", robot.leftBackDrive.getCurrentPosition());
 
-<<<<<<< HEAD
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
                     programState = currentState.TWIST_FORWARD;
-=======
-                if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
-                    programState = currentState.TWIST_BACKWARD;
->>>>>>> refs/remotes/Leo352/master
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
@@ -155,20 +143,12 @@ public class BotmanAutoRedFarSide extends OpMode {
 
             //This case twists the robot forward and then returns it to its original position
             case TWIST_FORWARD:
-<<<<<<< HEAD
                 if(robot.heading() >= 0){
-=======
-                if(robot.heading() >= -30){
->>>>>>> refs/remotes/Leo352/master
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
                 else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-<<<<<<< HEAD
                     programState = currentState.OTHER_MOVE;
-=======
-                    programState = currentState.ADJUST;
->>>>>>> refs/remotes/Leo352/master
                 }
                 break;
 
@@ -177,7 +157,6 @@ public class BotmanAutoRedFarSide extends OpMode {
                 if(robot.heading() <= 10){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-<<<<<<< HEAD
                 else if (robot.heading() >= 0){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
@@ -188,27 +167,11 @@ public class BotmanAutoRedFarSide extends OpMode {
             case OTHER_MOVE:
                 if(robot.heading() <= 180){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
-=======
-                else if (robot.heading() >= -30){
-                    robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
-                    programState = currentState.ADJUST;
-                }
-                break;
-
-            case ADJUST:
-                if(robot.heading() < -150){
-                    robot.arrayDrive(0.2,-0.2,0.2,-0.2);
->>>>>>> refs/remotes/Leo352/master
                 }
                 else{
                     programState = currentState.MOVE;
                 }
-<<<<<<< HEAD
             //This case simply moves the robot forward 8 inches
-=======
-
->>>>>>> refs/remotes/Leo352/master
             case MOVE:
                 robot.arrayDrive(0,0,0,0);
                 robot.resetEncoders();
@@ -268,11 +231,8 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;
 
             case BACKUP:
-<<<<<<< HEAD
                 robot.arrayDrive(0,0,0,0);
                 robot.resetEncoders();
-=======
->>>>>>> refs/remotes/Leo352/master
                 if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-2)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
