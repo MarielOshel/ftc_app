@@ -279,6 +279,7 @@ public class HardwareBotman
         return output;
     }
 
+<<<<<<< HEAD
     void driveByGyro(double speed){
         if(speed > 0.9) {
             speed = 0.89;
@@ -289,6 +290,15 @@ public class HardwareBotman
             arrayDrive(speed, speed + 0.1, speed, speed + 0.1);
         }
 
+=======
+    void driveWithHeading(double speed){
+        if(heading() > 2){
+            arrayDrive(speed, speed - 0.1, speed, speed -0.1);
+        }
+        if(heading() < -2){
+            arrayDrive(speed - 0.1, speed, speed - 0.1, speed);
+        }
+>>>>>>> refs/remotes/Leo352/master
     }
 
     double ticsPerInch(double distance){
