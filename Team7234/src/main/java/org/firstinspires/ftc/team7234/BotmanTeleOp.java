@@ -12,15 +12,17 @@ public class BotmanTeleOp extends OpMode{
     /* Declare OpMode members. */
     private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
-    //Declares the power scaling of the robot
 
     private static final double driveCurve = 1.0;
     private static final double extensionPow = 0.5;
+
     private double driveMultiplier = 1.0;
     private double armPower = 0;
     private double relicIncrementing = 0;
     private double relicPos;
     private double headingLock;
+
+    private double targetHead;
 
     private boolean isMecanum;
     private boolean orientationLock;
@@ -30,12 +32,22 @@ public class BotmanTeleOp extends OpMode{
     private boolean gripperToggle;
     private boolean speedToggle;
     private boolean orientationToggle;
+    private boolean rotationToggle;
 
     double magnitude;
     double rotation;
     double angle;
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
+
+    private enum turningState{
+        NORMAL,
+        LEFT,
+        RIGHT,
+        LOCKED
+    }
+
+    private turningState turnState = turningState.NORMAL;
 
     //endregion
 
@@ -58,6 +70,8 @@ public class BotmanTeleOp extends OpMode{
 
         //endregion
         relicPos = robot.relicClaw.getPosition();
+
+
     }
     @Override
     public void init_loop(){}
@@ -75,18 +89,39 @@ public class BotmanTeleOp extends OpMode{
         }
         //calculates robot speed from the joystick's distance from the center
         magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
+
         // How much the robot should turn while moving in that direction
-        if(orientationLock){
-            if (robot.heading() < headingLock){
-                rotation = 0.1;
-            }
-            else if (robot.heading() > headingLock){
-                rotation = -0.1;
-            }
-            //TODO: Add code to lock the orientation
-        }
-        else{
-            rotation = driveMultiplier* Range.clip(gamepad1.right_stick_x, -1, 1);
+
+        switch(turnState){
+            case NORMAL:
+                rotation = driveMultiplier* Range.clip(gamepad1.right_stick_x, -1, 1);
+                break;
+            case LEFT:
+                if (robot.heading() > targetHead - 3.0 && robot.heading() < targetHead + 3.0){
+                    turnState = turningState.NORMAL;
+                    break;
+                }
+                else{
+                    rotation = -0.5;
+                    break;
+                }
+            case RIGHT:
+                if (robot.heading() >targetHead - 3.0 && robot.heading() < targetHead + 3.0){
+                    turnState = turningState.NORMAL;
+                    break;
+                }
+                else{
+                    rotation = 0.5;
+                    break;
+                }
+            case LOCKED:
+                if (robot.heading() < headingLock){
+                    rotation = 0.1;
+                }
+                else if (robot.heading() > headingLock){
+                    rotation = -0.1;
+                }
+                break;
         }
 
         //Variables for tank drive
@@ -162,7 +197,12 @@ public class BotmanTeleOp extends OpMode{
         //region Orientation Lock
         if (orientationToggle){
             if (gamepad1.left_stick_button){
-                orientationLock = !orientationLock;
+                if (turnState == turningState.LOCKED){
+                    turnState = turningState.NORMAL;
+                }
+                else {
+                    turnState = turningState.LOCKED;
+                }
                 headingLock = robot.heading();
                 orientationToggle = false;
             }
@@ -171,6 +211,25 @@ public class BotmanTeleOp extends OpMode{
             orientationToggle = true;
         }
         //endregion
+
+        //region Rotations
+        if (rotationToggle){
+            if (gamepad1.dpad_left){
+                turnState = turningState.LEFT;
+                targetHead = (robot.heading() > 90.0) ? robot.heading() -270.0 : robot.heading() +90;
+                rotationToggle = false;
+            }
+            else if (gamepad1.dpad_right){
+                turnState = turningState.RIGHT;
+                targetHead = (robot.heading()>-90.0) ? robot.heading() -90 : robot.heading() + 270.0;
+                rotationToggle = false;
+            }
+        }
+        else if(!gamepad1.dpad_right && !gamepad1.dpad_left){
+            rotationToggle = true;
+        }
+        //endregion
+
         //endregion
         //region Robot Control
 
