@@ -67,6 +67,7 @@ public class BotmanTeleOp extends OpMode{
         gripperToggle = true;
         speedToggle = true;
         orientationToggle = true;
+        rotationToggle = true;
 
         //endregion
         relicPos = robot.relicClaw.getPosition();
