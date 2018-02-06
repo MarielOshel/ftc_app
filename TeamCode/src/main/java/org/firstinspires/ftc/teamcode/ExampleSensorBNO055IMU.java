@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -94,7 +96,7 @@ public class ExampleSensorBNO055IMU extends OpMode
     public void loop() {
 
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        accel  = imu.getAcceleration();
+        accel  = imu.getLinearAcceleration();
 
 
         telemetry.addData("heading", angles.firstAngle);
@@ -103,6 +105,7 @@ public class ExampleSensorBNO055IMU extends OpMode
         telemetry.addData("X accel", accel.xAccel);
         telemetry.addData("Y accel", accel.yAccel);
         telemetry.addData("Z accel", accel.zAccel);
+        Log.i("Test", "X Axis Accel " + accel.xAccel);
 
     }
 
