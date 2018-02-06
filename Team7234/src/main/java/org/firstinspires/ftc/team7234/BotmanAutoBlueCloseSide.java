@@ -41,9 +41,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import static com.sun.tools.javac.util.Constants.format;
 
 
-@Autonomous(name = "Botman Auto Blue Far", group = "Example")
+@Autonomous(name = "Botman Auto Blue Close", group = "Example")
 //@Disabled
-public class BotmanAutoBlueFarSide extends OpMode {
+public class BotmanAutoBlueCloseSide extends OpMode {
 
     //Sets up classes and variables for later use
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
