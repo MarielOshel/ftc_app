@@ -143,7 +143,7 @@ public class BotmanAutoRedFarSide extends OpMode {
 
             //This case twists the robot forward and then returns it to its original position
             case TWIST_FORWARD:
-                if(robot.heading() >= 0){
+                if(robot.heading() >= -10){
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
                 else{
@@ -165,7 +165,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;
 
             case OTHER_MOVE:
-                if(robot.heading() <= 180){
+                if(robot.heading() <= 165){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
                 }
                 else{
@@ -176,7 +176,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 robot.arrayDrive(0,0,0,0);
                 robot.resetEncoders();
                 if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
-                    robot.arrayDrive(0.5,0.5,0.5,0.5);
+                    robot.driveByGyro(0.3, 165);
                 }
                 else{
                     programState = currentState.MOVE_RIGHT;

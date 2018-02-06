@@ -279,13 +279,14 @@ public class HardwareBotman
         return output;
     }
 
-    void driveByGyro(double speed){
+    void driveByGyro(double speed, double header){
         if(speed > 0.9) {
             speed = 0.89;
         }
-        if (heading() > 0) {
+        if (heading() > header + 2) {
             arrayDrive(speed + 0.1, speed, speed + 0.1, speed);
-        } else if (heading() < 0) {
+        }
+        else if (heading() < header - 2) {
             arrayDrive(speed, speed + 0.1, speed, speed + 0.1);
         }
 
