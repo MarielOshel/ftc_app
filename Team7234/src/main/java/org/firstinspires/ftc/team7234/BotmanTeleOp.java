@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team7234;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="BotmanTeleOp", group="Pushbot")
@@ -11,39 +12,65 @@ public class BotmanTeleOp extends OpMode{
     /* Declare OpMode members. */
     private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
-    //Declares the power scaling of the robot
+
     private static final double driveCurve = 1.0;
     private static final double extensionPow = 0.5;
+
     private double driveMultiplier = 1.0;
     private double armPower = 0;
+    private double relicIncrementing = 0;
+    private double relicPos;
+    private double headingLock;
+
+    private double targetHead;
+
     private boolean isMecanum;
+    private boolean orientationLock;
+    private boolean speedControl;
 
     private boolean mecanumToggle;
     private boolean gripperToggle;
-    private boolean speedControl;
     private boolean speedToggle;
+    private boolean orientationToggle;
+    private boolean rotationToggle;
 
+    double magnitude;
+    double rotation;
+    double angle;
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
+
+    private enum turningState{
+        NORMAL,
+        LEFT,
+        RIGHT,
+        LOCKED
+    }
+
+    private turningState turnState = turningState.NORMAL;
 
     //endregion
 
     @Override
     public void init() {
         robot.init(hardwareMap, false);
+        robot.setMotorFloatMode(DcMotor.ZeroPowerBehavior.BRAKE);
         //region Boolean Initialization
 
         //Controlling Booleans
         isMecanum = true;
         speedControl = false;
+        orientationLock = false;
 
         //Toggle Booleans
         mecanumToggle = true;
         gripperToggle = true;
         speedToggle = true;
+        orientationToggle = true;
+        rotationToggle = true;
 
         //endregion
-
+        relicPos = robot.relicClaw.getPosition();
 
 
     }
@@ -53,35 +80,78 @@ public class BotmanTeleOp extends OpMode{
     public void start(){}
     @Override
     public void loop() {
-        //region Drive Variables
-
         //region Values
         driveMultiplier = speedControl ? 0.5 : 1;
 
         //calculates angle in radians based on joystick position, reports in range [-Pi/2, 3Pi/2]
-        double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
+        angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) + (Math.PI / 2);
         if (Double.isNaN(angle)){
             angle = 0;              //Prevents NaN error later in the Program
         }
         //calculates robot speed from the joystick's distance from the center
-        double magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
+        magnitude = driveMultiplier*Math.pow(Range.clip(Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2)), 0, 1), driveCurve);
+
         // How much the robot should turn while moving in that direction
-        double rotation = driveMultiplier*Range.clip(gamepad1.right_stick_x, -1, 1);
+
+        switch(turnState){
+            case NORMAL:
+                rotation = driveMultiplier* Range.clip(gamepad1.right_stick_x, -1, 1);
+                break;
+            case LEFT:
+                if (robot.heading() > targetHead - 3.0 && robot.heading() < targetHead + 3.0){
+                    turnState = turningState.NORMAL;
+                    break;
+                }
+                else{
+                    rotation = -0.5;
+                    break;
+                }
+            case RIGHT:
+                if (robot.heading() >targetHead - 3.0 && robot.heading() < targetHead + 3.0){
+                    turnState = turningState.NORMAL;
+                    break;
+                }
+                else{
+                    rotation = 0.5;
+                    break;
+                }
+            case LOCKED:
+                if (robot.heading() < headingLock){
+                    rotation = 0.1;
+                }
+                else if (robot.heading() > headingLock){
+                    rotation = -0.1;
+                }
+                break;
+        }
 
         //Variables for tank drive
         double left = -gamepad1.left_stick_y;
         double right = -gamepad1.right_stick_y;
-        //Variable for arm control
 
-        armPower = gamepad2.left_trigger - gamepad2.right_trigger;
-
-        double relicPower = (gamepad2.x) ? gamepad2.left_stick_y : 0;
+        double relicPower = (gamepad2.x) ? Range.clip(gamepad2.left_stick_y, -1.0, 1) : 0;
 
         if (robot.armLimit.getState() && armPower < 0){
             armPower = 0;
         }
+        else {
+            armPower = gamepad2.left_trigger - gamepad2.right_trigger;
+        }
         //endregion
+        //region Relic Claw
+        relicIncrementing = gamepad2.right_stick_y / 500.0;
 
+        if (relicPos + relicIncrementing > 1.0){
+            relicPos = 1.0;
+        }
+        else if (relicPos + relicIncrementing < 0.0){
+            relicPos = 0.0;
+        }
+        else{
+            relicPos += relicIncrementing;
+        }
+        robot.relicClaw.setPosition(relicPos);
+        //endregion
         //region Toggles
 
         //region Mecanum Toggles
@@ -125,16 +195,49 @@ public class BotmanTeleOp extends OpMode{
         }
         //endregion
 
-        //endregion
+        //region Orientation Lock
+        if (orientationToggle){
+            if (gamepad1.left_stick_button){
+                if (turnState == turningState.LOCKED){
+                    turnState = turningState.NORMAL;
+                }
+                else {
+                    turnState = turningState.LOCKED;
+                }
+                headingLock = robot.heading();
+                orientationToggle = false;
+            }
+        }
+        else if (!gamepad1.left_stick_button){
+            orientationToggle = true;
+        }
         //endregion
 
+        //region Rotations
+        if (rotationToggle){
+            if (gamepad1.dpad_left){
+                turnState = turningState.LEFT;
+                targetHead = (robot.heading() > 90.0) ? robot.heading() -270.0 : robot.heading() +90;
+                rotationToggle = false;
+            }
+            else if (gamepad1.dpad_right){
+                turnState = turningState.RIGHT;
+                targetHead = (robot.heading()>-90.0) ? robot.heading() -90 : robot.heading() + 270.0;
+                rotationToggle = false;
+            }
+        }
+        else if(!gamepad1.dpad_right && !gamepad1.dpad_left){
+            rotationToggle = true;
+        }
+        //endregion
+
+        //endregion
         //region Robot Control
-
 
         //Sends Power to the Robot Arm
         robot.arm.setPower(armPower);
-        //Drives the robot
 
+        //Drives the robot
         if (isMecanum){
             robot.mecanumDrive(angle, magnitude, rotation); //Drives Omnidirectionally
         }
@@ -154,14 +257,12 @@ public class BotmanTeleOp extends OpMode{
         }
 
         //endregion
-
         //region Gripper Control
         robot.gripperSet(gripState);
         //endregion
         //region Relic Control
         robot.relicArm.setPower(relicPower);
         //endregion
-
         //region Telemetry
 
         telemetry.addData("isMecanum: ", isMecanum);
@@ -171,6 +272,9 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("Angle: ", angle);
         telemetry.addData("Magnitude: ", magnitude);
         telemetry.addData("Rotation: ", rotation);
+        telemetry.addLine();
+        telemetry.addData("Relic Power: ", relicPower);
+        telemetry.addData("Relic Position: ", relicPos);
         telemetry.addLine();
         telemetry.addData("X: ", gamepad1.left_stick_x);
         telemetry.addData("Y: ", gamepad1.left_stick_y);

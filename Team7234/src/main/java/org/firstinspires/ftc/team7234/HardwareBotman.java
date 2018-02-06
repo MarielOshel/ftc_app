@@ -37,6 +37,7 @@ public class HardwareBotman
     Servo   leftClaw    = null;
     Servo   rightClaw   = null;
     Servo   jewelPusher = null;
+    Servo   relicClaw = null;
 
     DigitalChannel armLimit = null;
 
@@ -52,17 +53,21 @@ public class HardwareBotman
 
     public static final double MID_SERVO       =  0.5 ;
 
-    public static final double RIGHT_GRIPPER_OPEN    =  0 ;
-    public static final double LEFT_GRIPPER_OPEN  = 1 ;
+    static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    static final double LEFT_GRIPPER_OPEN  = 1 ;
 
     private static final double RIGHT_GRIPPER_HALF = 0.7;
     private static final double LEFT_GRIPPER_HALF = 0.3;
 
-    public static final double RIGHT_GRIPPER_CLOSED    =  1 ;
-    public static final double LEFT_GRIPPER_CLOSED  = 0;
+    static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    static final double LEFT_GRIPPER_CLOSED  = 0;
 
-    static final double JEWEL_PUSHER_UP = 0.35;
-    static final double JEWEL_PUSHER_DOWN = 0.95;
+    static final double JEWEL_PUSHER_UP = 0.32;
+    static final double JEWEL_PUSHER_DOWN = 1;
+
+    static final double RELIC_ARM_TOP = 0.02;
+    static final double RELIC_ARM_BOTTOM = 1.0;
+
     //endregion
 
     //Establishes variables for motors
@@ -80,7 +85,8 @@ public class HardwareBotman
             return vals[(this.ordinal()+1) % vals.length];
         }
         public GripperState previous(){
-            return vals[(this.ordinal()-1) % vals.length];
+            int n = (this.ordinal()-1 % vals.length < 0) ? vals.length-1 : this.ordinal()-1 % vals.length;
+            return vals[n];
         }
     }
 
@@ -134,9 +140,15 @@ public class HardwareBotman
         leftClaw  = hwMap.get(Servo.class, "leftClaw");
         rightClaw = hwMap.get(Servo.class, "rightClaw");
         jewelPusher = hwMap.get(Servo.class, "jewelPusher");
+        relicClaw = hwMap.get(Servo.class, "relicClaw");
+
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
+        relicClaw.scaleRange(RELIC_ARM_TOP, RELIC_ARM_BOTTOM);
+        relicClaw.setPosition(0.0);
+
+
 
         //Define sensors
         jewelColorSensor = hwMap.get(ColorSensor.class, "jewelColorSensor");
@@ -153,6 +165,12 @@ public class HardwareBotman
         // and named "imu".
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+    }
+
+    void setMotorFloatMode(DcMotor.ZeroPowerBehavior behavior){
+        for (int i=0; i < 4; i++){
+            driveMotors[i].setZeroPowerBehavior(behavior);
+        }
     }
 
     double heading(){
@@ -261,13 +279,16 @@ public class HardwareBotman
         return output;
     }
 
-    void driveWithHeading(double speed){
-        if(heading() > 2){
-            arrayDrive(speed, speed - 0.1, speed, speed -0.1);
+    void driveByGyro(double speed){
+        if(speed > 0.9) {
+            speed = 0.89;
         }
-        if(heading() < -2){
-            arrayDrive(speed - 0.1, speed, speed - 0.1, speed);
+        if (heading() > 0) {
+            arrayDrive(speed + 0.1, speed, speed + 0.1, speed);
+        } else if (heading() < 0) {
+            arrayDrive(speed, speed + 0.1, speed, speed + 0.1);
         }
+
     }
 
     double ticsPerInch(double distance){
@@ -281,10 +302,10 @@ public class HardwareBotman
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 

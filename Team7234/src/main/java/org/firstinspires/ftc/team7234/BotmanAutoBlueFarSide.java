@@ -107,7 +107,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             //All this case does is show us some telemetry of what the camera picks up
             case KEY:
-                if(robot.armLimit.getState()){
+                if(!robot.armLimit.getState()){
                     telemetry.addData("We are seeing", keyFinder);
                     robot.leftClaw.setPosition(robot.LEFT_GRIPPER_CLOSED);
                     robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_CLOSED);
@@ -131,17 +131,17 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
-                    programState = currentState.TWIST_FORWARD;
+                    programState = currentState.TWIST_BACKWARD;
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
-                    programState = currentState.TWIST_BACKWARD;
+                    programState = currentState.TWIST_FORWARD;
                 }
                 break;
 
             //This case twists the robot forward and then returns it to its original position
             case TWIST_FORWARD:
-                if(robot.heading() >= -30){
+                if(robot.heading() >= -15){
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
                 else{
@@ -155,7 +155,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 if(robot.heading() <= 10){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.heading() >= -30){
+                else if (robot.heading() >= -15){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                     programState = currentState.MOVE;
@@ -222,6 +222,8 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 break;
 
             case BACKUP:
+                robot.arrayDrive(0,0,0,0);
+                robot.resetEncoders();
                 if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-2)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }

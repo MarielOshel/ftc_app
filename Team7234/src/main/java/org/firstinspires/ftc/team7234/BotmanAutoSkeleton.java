@@ -48,7 +48,7 @@ import static com.sun.tools.javac.util.Constants.format;
  * Demonstrates empty OpMode
  */
 @Autonomous(name = "Botman Auto Test", group = "Example")
-@Disabled
+//@Disabled
 public class BotmanAutoSkeleton extends OpMode {
 
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
