@@ -25,7 +25,6 @@ public class BotmanTeleOp extends OpMode{
     private double targetHead;
 
     private boolean isMecanum;
-    private boolean orientationLock;
     private boolean speedControl;
 
     private boolean mecanumToggle;
@@ -59,7 +58,6 @@ public class BotmanTeleOp extends OpMode{
         //Controlling Booleans
         isMecanum = true;
         speedControl = false;
-        orientationLock = false;
 
         //Toggle Booleans
         mecanumToggle = true;
@@ -267,6 +265,7 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("isMecanum: ", isMecanum);
         telemetry.addData("gripperState: ", gripState);
         telemetry.addData("Speed Limited to: ", driveMultiplier);
+        telemetry.addData("TurningState: ", turnState);
         telemetry.addLine();
         telemetry.addData("Angle: ", angle);
         telemetry.addData("Magnitude: ", magnitude);
