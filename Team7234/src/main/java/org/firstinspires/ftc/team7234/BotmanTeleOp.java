@@ -53,8 +53,7 @@ public class BotmanTeleOp extends OpMode{
 
     @Override
     public void init() {
-        robot.init(hardwareMap, false);
-        robot.setMotorFloatMode(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.init(hardwareMap, false, DcMotor.ZeroPowerBehavior.BRAKE);
         //region Boolean Initialization
 
         //Controlling Booleans
