@@ -97,6 +97,11 @@ public class HardwareBotman
     /* Constructor */
     HardwareBotman(){}
 
+    //alternative init to accomodate older code without Zero Power Behavior
+    void init(HardwareMap ahwMap, boolean reverseRight, DcMotor.ZeroPowerBehavior behavior){
+        init(ahwMap, reverseRight);
+        setMotorFloatMode(behavior);
+    }
     /* Initialize standard Hardware interfaces */
     void init(HardwareMap ahwMap, boolean reverseRight) {
         // Save reference to Hardware map

@@ -53,8 +53,7 @@ public class BotmanTeleOp extends OpMode{
 
     @Override
     public void init() {
-        robot.init(hardwareMap, false);
-        robot.setMotorFloatMode(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.init(hardwareMap, false, DcMotor.ZeroPowerBehavior.BRAKE);
         //region Boolean Initialization
 
         //Controlling Booleans
@@ -197,7 +196,7 @@ public class BotmanTeleOp extends OpMode{
 
         //region Orientation Lock
         if (orientationToggle){
-            if (gamepad1.left_stick_button){
+            if (gamepad1.right_stick_button){
                 if (turnState == turningState.LOCKED){
                     turnState = turningState.NORMAL;
                 }
@@ -208,7 +207,7 @@ public class BotmanTeleOp extends OpMode{
                 orientationToggle = false;
             }
         }
-        else if (!gamepad1.left_stick_button){
+        else if (!gamepad1.right_stick_button){
             orientationToggle = true;
         }
         //endregion
