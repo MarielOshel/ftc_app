@@ -35,6 +35,7 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
@@ -72,7 +73,7 @@ public class BotmanAutoRedCloseSide extends OpMode {
     //sets up our camera as a sensor
     @Override
     public void init() {
-        robot.init(hardwareMap, true);
+        robot.init(hardwareMap, true, DcMotor.ZeroPowerBehavior.FLOAT);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
