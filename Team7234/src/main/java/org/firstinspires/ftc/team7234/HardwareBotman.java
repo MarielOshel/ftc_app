@@ -294,6 +294,9 @@ public class HardwareBotman
         else if (heading() < header - 2) {
             arrayDrive(speed, speed + 0.1, speed, speed + 0.1);
         }
+        else{
+            arrayDrive(speed, speed, speed, speed);
+        }
 
     }
 
