@@ -50,6 +50,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
     HardwareBotman robot = new HardwareBotman();
+    double target;
 
 
     //This sets up an enumeration statement that we use to run the robot
@@ -146,6 +147,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     programState = currentState.MOVE;
                 }
@@ -158,19 +160,18 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 }
                 else if (robot.heading() >= -15){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
+                    robot.arrayDrive(0,0,0,0);
                     programState = currentState.MOVE;
                 }
                 break;
 
             //This case simply moves the robot forward 8 inches
             case MOVE:
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
+                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(3)){
                     robot.driveByGyro(0.3, -15);
                 }
                 else{
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE_RIGHT;
                 }
                 break; //remove after testing
@@ -211,21 +212,19 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 robot.leftClaw.setPosition(robot.LEFT_GRIPPER_OPEN);
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
+                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
+                    target = robot.leftBackDrive.getCurrentPosition();
+                    robot.arrayDrive(0,0,0,0);
                     programState = currentState.BACKUP;
                 }
 
                 break;
 
             case BACKUP:
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-2)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(-2)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
