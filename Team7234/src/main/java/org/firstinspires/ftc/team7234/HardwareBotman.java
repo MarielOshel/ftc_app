@@ -65,8 +65,8 @@ public class HardwareBotman
     static final double JEWEL_PUSHER_UP = 0.32;
     static final double JEWEL_PUSHER_DOWN = 1;
 
-    static final double RELIC_ARM_TOP = 0.02;
-    static final double RELIC_ARM_BOTTOM = 1.0;
+    static final double RELIC_ARM_BOTTOM = 0.0;
+    static final double RELIC_ARM_TOP = 1.0;
 
     //endregion
 
@@ -148,7 +148,7 @@ public class HardwareBotman
         leftClaw.setPosition(LEFT_GRIPPER_OPEN);
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
-        relicClaw.scaleRange(RELIC_ARM_TOP, RELIC_ARM_BOTTOM);
+        relicClaw.scaleRange(RELIC_ARM_BOTTOM, RELIC_ARM_TOP);
         relicClaw.setPosition(1.0);
 
 
@@ -283,7 +283,7 @@ public class HardwareBotman
     }
 
     double ticsPerInch(double distance){
-        return (280/Math.PI) * distance;
+        return (-280/Math.PI) * distance;
     }
 
     void resetEncoders() {

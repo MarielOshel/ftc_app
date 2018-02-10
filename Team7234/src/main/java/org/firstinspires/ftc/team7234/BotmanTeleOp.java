@@ -135,7 +135,7 @@ public class BotmanTeleOp extends OpMode{
             armPower = gamepad2.left_trigger - gamepad2.right_trigger;
         }
         //endregion
-        //region Relic Claw
+        //region 5 Claw
         relicIncrementing = gamepad2.right_stick_y / 500.0;
 
         if (relicPos + relicIncrementing > 1.0){

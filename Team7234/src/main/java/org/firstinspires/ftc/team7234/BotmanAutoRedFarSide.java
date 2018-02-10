@@ -151,6 +151,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.OTHER_MOVE;
                 }
                 break;
@@ -163,6 +164,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 else if (robot.heading() >= 0){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.OTHER_MOVE;
                 }
                 break;
@@ -173,17 +175,18 @@ public class BotmanAutoRedFarSide extends OpMode {
                 }
                 else{
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
             //This case simply moves the robot forward 8 inches
             case MOVE:
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target - 100){
                     robot.driveByGyro(0.3, 165);
                 }
                 else{
-                    target = robot.leftBackDrive.getCurrentPosition();
                     robot.arrayDrive(0,0,0,0);
-                    programState = currentState.MOVE_RIGHT;
+                    target = robot.leftBackDrive.getCurrentPosition();
+                    //programState = currentState.MOVE_RIGHT;
                 }
                 break; //remove after testing
                 /*
