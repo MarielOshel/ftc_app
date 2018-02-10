@@ -136,8 +136,10 @@ public class HardwareBotman
         rightBackDrive.setPower(0);
         arm.setPower(0);
 
-        // Resets the encoders of the robot
+        // Set all motors to run without encoders.
+        // May want to use RUN_USING_ENCODERS if encoders are installed.
         resetEncoders();
+
 
         // Define and initialize ALL installed servos.
         leftClaw  = hwMap.get(Servo.class, "leftClaw");
@@ -149,7 +151,7 @@ public class HardwareBotman
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
         relicClaw.scaleRange(RELIC_ARM_TOP, RELIC_ARM_BOTTOM);
-        relicClaw.setPosition(1.0);
+        relicClaw.setPosition(0.0);
 
 
 
@@ -201,6 +203,25 @@ public class HardwareBotman
             default: throw new IllegalArgumentException("GripperState contains an unexpected value. I'm not even sure how you managed this.");
         }
     }
+
+    /* Old code no longer used
+    void gripperOpen() {
+        leftClaw.setPosition(LEFT_GRIPPER_OPEN);
+        rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
+    }
+    void gripperClose() {
+        leftClaw.setPosition(LEFT_GRIPPER_CLOSED);
+        rightClaw.setPosition(RIGHT_GRIPPER_CLOSED);
+    }
+
+    */
+
+    //endregion
+
+    //region Relic Arm Control
+    public void extendRelicArm(){
+
+    }
     //endregion
 
     //region Robot Driving
@@ -210,8 +231,6 @@ public class HardwareBotman
         leftBackDrive.setPower(lb);
         rightBackDrive.setPower(rb);
     }
-
-
     void mecanumDrive(double angle, double magnitude, double rotation){  //Calculates and sends values to wheels
         //region Exceptions
         if(angle> 1.5 *Math.PI || angle< -0.5*Math.PI){
@@ -253,7 +272,6 @@ public class HardwareBotman
         //endregion
     }
     //endregion
-
     //Function to limit values to a range
     private double clip(double input, double min, double max){   //Method for clipping a value within a range
         double output = input;
