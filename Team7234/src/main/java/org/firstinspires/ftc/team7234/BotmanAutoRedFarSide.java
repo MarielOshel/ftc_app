@@ -104,6 +104,8 @@ public class BotmanAutoRedFarSide extends OpMode {
             telemetry.addData("VuMark", "not visible");
         }
         relicVuMark.vuMark = RelicRecoveryVuMark.from(relicVuMark.relicTemplate);
+        telemetry.addData("Encoder:", robot.leftBackDrive.getCurrentPosition());
+        telemetry.addData("Case:", programState);
         telemetry.addData("Hue:", robot.hsvValues[0]);
         telemetry.addData("Saturation:", robot.hsvValues[1]);
         telemetry.addData("Value:", robot.hsvValues[2]);
@@ -161,7 +163,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 if(robot.heading() <= 10){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.heading() >= 0){
+                else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
@@ -170,6 +172,17 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;
 
             case OTHER_MOVE:
+                if(robot.leftBackDrive.getCurrentPosition() >= target - robot.ticsPerInch(-1)){
+                    robot.driveByGyro(0.3, 0);
+                }
+                else{
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
+                    programState = currentState.TURN_AROUND;
+                }
+                break;
+
+            case TURN_AROUND:
                 if(robot.heading() <= 165){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
                 }
@@ -178,6 +191,8 @@ public class BotmanAutoRedFarSide extends OpMode {
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
+                break;
+
             //This case simply moves the robot forward 8 inches
             case MOVE:
                 if (robot.leftBackDrive.getCurrentPosition() >= target - 100){

@@ -104,6 +104,8 @@ public class BotmanAutoRedCloseSide extends OpMode {
             telemetry.addData("VuMark", "not visible");
         }
         relicVuMark.vuMark = RelicRecoveryVuMark.from(relicVuMark.relicTemplate);
+        telemetry.addData("Encoder:", robot.leftBackDrive.getCurrentPosition());
+        telemetry.addData("Case:", programState);
         telemetry.addData("Hue:", robot.hsvValues[0]);
         telemetry.addData("Saturation:", robot.hsvValues[1]);
         telemetry.addData("Value:", robot.hsvValues[2]);
@@ -170,7 +172,18 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 break;
 
             case OTHER_MOVE:
-                if(robot.heading() <= 180){
+                if(robot.leftBackDrive.getCurrentPosition() >= target - robot.ticsPerInch(-1)){
+                    robot.driveByGyro(0.3, 0);
+                }
+                else{
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
+                    programState = currentState.TURN_AROUND;
+                }
+                break;
+
+            case TURN_AROUND:
+                if(robot.heading() <= 165){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
                 }
                 else{
@@ -178,9 +191,10 @@ public class BotmanAutoRedCloseSide extends OpMode {
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
+                break;
                 //This case simply moves the robot forward 8 inches
             case MOVE:
-                if(robot.leftBackDrive.getCurrentPosition() >= target - 100){
+                if(robot.leftBackDrive.getCurrentPosition() >= target - 50){
                     robot.driveByGyro(0.3, 180);
                 }
                 else{
