@@ -267,8 +267,8 @@ public class HardwareBotman
     }
 
     void driveByGyro(double speed, double header){
-        if(speed > 0.9 || speed < 0.1) {
-            throw new IllegalArgumentException("Nah fam, keep it between 0.1 and .9" + speed);
+        if(speed > 0.9 || speed < -0.9) {
+            throw new IllegalArgumentException("Nah fam, keep it between -0.9 and 0.9" + speed);
         }
         if (heading() > header + 3) {
             arrayDrive(speed + 0.1, speed - 0.1, speed + 0.1, speed - 0.1);

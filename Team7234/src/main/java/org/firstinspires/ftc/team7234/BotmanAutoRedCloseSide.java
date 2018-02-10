@@ -173,7 +173,7 @@ public class BotmanAutoRedCloseSide extends OpMode {
 
             case OTHER_MOVE:
                 if(robot.leftBackDrive.getCurrentPosition() >= target - robot.ticsPerInch(-1)){
-                    robot.driveByGyro(0.3, 0);
+                    robot.driveByGyro(-0.3, 0);
                 }
                 else{
                     robot.arrayDrive(0,0,0,0);
@@ -194,13 +194,13 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 break;
                 //This case simply moves the robot forward 8 inches
             case MOVE:
-                if(robot.leftBackDrive.getCurrentPosition() >= target - 50){
+                if(robot.leftBackDrive.getCurrentPosition() >= target - 500){
                     robot.driveByGyro(0.3, 180);
                 }
                 else{
                     robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
-                    //programState = currentState.MOVE_RIGHT;
+                    programState = currentState.MOVE_RIGHT;
                 }
                 break; //remove after testing
                 /*
