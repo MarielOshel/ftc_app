@@ -172,7 +172,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;
 
             case OTHER_MOVE:
-                if(robot.leftBackDrive.getCurrentPosition() >= target - robot.ticsPerInch(-1)){
+                if(robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-1)){
                     robot.driveByGyro(-0.3, 0);
                 }
                 else{
@@ -183,7 +183,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;
 
             case TURN_AROUND:
-                if(robot.heading() <= 165){
+                if(robot.heading() >= -180){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
                 }
                 else{
@@ -196,7 +196,7 @@ public class BotmanAutoRedFarSide extends OpMode {
             //This case simply moves the robot forward 8 inches
             case MOVE:
                 if (robot.leftBackDrive.getCurrentPosition() >= target - 500){
-                    robot.driveByGyro(0.3, 165);
+                    robot.driveByGyro(0.3, -190);
                 }
                 else{
                     robot.arrayDrive(0,0,0,0);
@@ -225,6 +225,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;*/
             case MOVE_RIGHT:
                 robot.arrayDrive(0,0,0,0);
+                target = robot.leftBackDrive.getCurrentPosition();
                 programState = currentState.SCORE;
                 break;
 
@@ -241,10 +242,11 @@ public class BotmanAutoRedFarSide extends OpMode {
                 robot.leftClaw.setPosition(robot.LEFT_GRIPPER_OPEN);
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
-                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.BACKUP;
                 }
@@ -252,7 +254,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;
 
             case BACKUP:
-                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(-2)){
+                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-2)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{

@@ -200,10 +200,11 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 }
                 break;*/
             case MOVE_RIGHT:
-                if(robot.heading() <= -90){
+                if(robot.heading() <= 90){
                     robot.arrayDrive(-0.3,0.3,-0.3,0.3);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.SCORE;
                 }
@@ -223,7 +224,7 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
 
-                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
@@ -234,7 +235,7 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 break;
 
             case BACKUP:
-                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(-2)){
+                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-1)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{

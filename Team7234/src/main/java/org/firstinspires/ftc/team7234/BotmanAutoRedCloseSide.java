@@ -172,7 +172,7 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 break;
 
             case OTHER_MOVE:
-                if(robot.leftBackDrive.getCurrentPosition() >= target - robot.ticsPerInch(-1)){
+                if(robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-1)){
                     robot.driveByGyro(-0.3, 0);
                 }
                 else{
@@ -183,7 +183,7 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 break;
 
             case TURN_AROUND:
-                if(robot.heading() <= 165){
+                if(robot.heading() >= -180){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
                 }
                 else{
@@ -223,10 +223,11 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 }
                 break;*/
             case MOVE_RIGHT:
-                if(robot.heading() >= 90){
-                    robot.arrayDrive(0.3,-0.3,0.3,-0.3);
+                if(robot.heading() <= -90){
+                    robot.arrayDrive(-0.3,0.3,-0.3,0.3);
                 }
                 else {
+                    robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.SCORE;
                 }
@@ -245,7 +246,7 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 robot.leftClaw.setPosition(robot.LEFT_GRIPPER_OPEN);
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
-                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
@@ -257,7 +258,7 @@ public class BotmanAutoRedCloseSide extends OpMode {
                 break;
 
             case BACKUP:
-                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(-2)){
+                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-1)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
