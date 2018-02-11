@@ -42,9 +42,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import static com.sun.tools.javac.util.Constants.format;
 
 
-@Autonomous(name = "Botman Auto Blue Far", group = "Example")
+@Autonomous(name = "Botman Auto Blue Close", group = "Example")
 //@Disabled
-public class BotmanAutoBlueFarSide extends OpMode {
+public class BotmanAutoBlueCloseSide extends OpMode {
 
     //Sets up classes and variables for later use
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
@@ -143,12 +143,12 @@ public class BotmanAutoBlueFarSide extends OpMode {
 
             //This case twists the robot forward and then returns it to its original position
             case TWIST_FORWARD:
-                if(robot.heading() >= -15){
+                if(robot.heading() >= -10){
                     robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
                 }
-                else{
-                    robot.arrayDrive(0,0,0,0);
+                else if(robot.heading() <= 0){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    robot.arrayDrive(0,0,0,0);
                     programState = currentState.MOVE;
                 }
                 break;
@@ -158,7 +158,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 if(robot.heading() <= 10){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.heading() >= -15){
+                else if (robot.heading() >= 0){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
                     programState = currentState.MOVE;
@@ -168,7 +168,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
             //This case simply moves the robot forward 8 inches
             case MOVE:
                 if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(3)){
-                    robot.driveByGyro(0.3, -15);
+                    robot.driveByGyro(0.3, 0);
                 }
                 else{
                     target = robot.leftBackDrive.getCurrentPosition();
@@ -195,8 +195,13 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 }
                 break;*/
             case MOVE_RIGHT:
-                robot.arrayDrive(0,0,0,0);
-                programState = currentState.SCORE;
+                if(robot.heading() <= -90){
+                    robot.arrayDrive(-0.3,0.3,-0.3,0.3);
+                }
+                else{
+                    target = robot.leftBackDrive.getCurrentPosition();
+                    programState = currentState.SCORE;
+                }
                 break;
 
             /*case LEFT:
@@ -212,12 +217,12 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 robot.leftClaw.setPosition(robot.LEFT_GRIPPER_OPEN);
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
+
                 if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
                     target = robot.leftBackDrive.getCurrentPosition();
-                    robot.arrayDrive(0,0,0,0);
                     programState = currentState.BACKUP;
                 }
 
