@@ -1,4 +1,4 @@
-/* Copyright (c) 2014, 2015 Qualcomm Technologies Inc
+/* Copyright (c) 2015 Qualcomm Technologies Inc
 
 All rights reserved.
 
@@ -29,44 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team535;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
 
-/**
- * Demonstrates empty OpMode
- */
-@Autonomous(name = "Blank OpMode", group = "Example")
-@Disabled
-public class BlankOpModeIterative extends OpMode {
+@TeleOp(name = "Servo Test", group = "Teleop")
+//@Disabled
 
-    private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+public class ServoTest extends OpMode {
+
+    HardwareTOBOR robo = new HardwareTOBOR();
+    double speedControl = 1;
+    boolean toggleR = false;
+    boolean runningR = false;
+    boolean toggleL = false;
+    boolean runningL = false;
+
 
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
-    }
 
+        robo.initRobo(hardwareMap);
+        telemetry.addData("Status:", "Robot is Initialized");
+
+    }
 
     @Override
     public void init_loop() { }
 
 
     @Override
-    public void start() {
-        runtime.reset();
-    }
-
-
-    @Override
     public void loop() {
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
+
+        robo.RPlate.setPosition(robo.RPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.right_stick_y)));
+
+        robo.LPlate.setPosition(robo.LPlate.getPosition()+(0.002*Range.clip(1,1,gamepad1.left_stick_y)));
+
+        telemetry.addData("RPlate", robo.RPlate.getPosition());
+        telemetry.addData("LPlate", robo.LPlate.getPosition());
     }
 
 
     @Override
-    public void stop() { }
+    public void stop() {
+        robo.FRMotor.setPower(0);
+        robo.BRMotor.setPower(0);
+        robo.FLMotor.setPower(0);
+        robo.BLMotor.setPower(0);
+        robo.rightTrack.setPower(0);
+        robo.leftTrack.setPower(0);
+    }
 }

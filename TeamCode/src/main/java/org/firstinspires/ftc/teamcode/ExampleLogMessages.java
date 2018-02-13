@@ -31,68 +31,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * Demonstrates how to setup and use 1 MR color sensor
+ * Demonstrates how to use logcat messages OpMode
  */
-@Autonomous(name = "Read MR Color Sensor with HSV", group = "Example")
+@Autonomous(name = "Log Example OpMode", group = "Example")
 //@Disabled
-public class Example1ColorSensor extends OpMode {
+public class ExampleLogMessages extends OpMode {
 
-    ColorSensor colorSensor;
-    //Array to hold the HSV values
-    float hsvValues[] = {0F,0F,0F};
+    private ElapsedTime runtime = new ElapsedTime();
+    private Double counter = 0d;
 
     @Override
     public void init() {
-        colorSensor = hardwareMap.colorSensor.get("colorsensor");
-        //This can be used to use a different address for the MR Color Sensor
-        //It comes from the factory with 0x3C, but if you want to more than one
-        //you need ot change the reference address on one of them.
-        colorSensor.setI2cAddress(I2cAddr.create8bit(0x3C));
-        //This command is used to turn the color sensor LED on and off.  In this
-        //statement the LED is turned off.
-        colorSensor.enableLed(false);
-
         telemetry.addData("Status", "Initialized");
+        Log.i("Test", "Initilize Robot");
     }
 
 
     @Override
-    public void init_loop() { }
+    public void init_loop() {
+    }
 
 
     @Override
-    public void start() { }
+    public void start() {
+        Log.i("Test", "Time since Initilize " + runtime.toString());
+        runtime.reset();
+        counter = runtime.seconds();
+        Log.i("Test", "Timer reset " + runtime.toString());
+
+    }
 
 
     @Override
     public void loop() {
-        //Pressing "A" on gamepad 1 will turn the LED off.  When not pressed it will be on.
-        if(gamepad1.a) {
-            colorSensor.enableLed(false);
-        } else {
-            colorSensor.enableLed(true);
+        if (runtime.seconds() - counter > 10) {
+            Log.i("Test", "Run Time " + runtime.toString());
+            counter = runtime.seconds();
         }
-        //Ths Java method will convert RGB values to HSV.  The values need to multiplied by 8 to have the correct input range
-        Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
 
-        telemetry.addData("0", "Press A on Gamepad1 to turn off LED");
-        telemetry.addData("1", "Red: " + colorSensor.red());
-        telemetry.addData("2", "Green: " + colorSensor.green());
-        telemetry.addData("3", "Blue: " + colorSensor.blue());
-        telemetry.addData("4", "Alpha: " + colorSensor.alpha());
-        telemetry.addData("5", "Hue: " + hsvValues[0]);
-        telemetry.addData("6", "Sat: " + hsvValues[1]);
-        telemetry.addData("7", "Val: " + hsvValues[2]);
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
     }
 
+
     @Override
-    public void stop() {}
+    public void stop() {
+        Log.i("Test",  "Stopping Robot!!!!!");
+    }
 }
