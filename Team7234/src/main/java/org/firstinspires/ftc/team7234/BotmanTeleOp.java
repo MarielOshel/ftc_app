@@ -113,11 +113,14 @@ public class BotmanTeleOp extends OpMode{
                     break;
                 }
             case LOCKED:
-                if (robot.heading() < headingLock){
-                    rotation = 0.1;
+                if (robot.heading() > headingLock - 3.0 && robot.heading() < headingLock + 3.0){
+                    rotation = 0.0;
+                }
+                else if (robot.heading() < headingLock){
+                    rotation = -0.1;
                 }
                 else if (robot.heading() > headingLock){
-                    rotation = -0.1;
+                    rotation = 0.1;
                 }
                 break;
         }
@@ -135,7 +138,7 @@ public class BotmanTeleOp extends OpMode{
             armPower = gamepad2.left_trigger - gamepad2.right_trigger;
         }
         //endregion
-        //region Relic Claw
+        //region 5 Claw
         relicIncrementing = gamepad2.right_stick_y / 500.0;
 
         if (relicPos + relicIncrementing > 1.0){

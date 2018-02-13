@@ -102,6 +102,8 @@ public class BotmanAutoBlueFarSide extends OpMode {
             telemetry.addData("VuMark", "not visible");
         }
         relicVuMark.vuMark = RelicRecoveryVuMark.from(relicVuMark.relicTemplate);
+        telemetry.addData("Encoder:", robot.leftBackDrive.getCurrentPosition());
+        telemetry.addData("Case:", programState);
         telemetry.addData("Hue:", robot.hsvValues[0]);
         telemetry.addData("Saturation:", robot.hsvValues[1]);
         telemetry.addData("Value:", robot.hsvValues[2]);
@@ -128,7 +130,6 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 Color.RGBToHSV(robot.jewelColorSensor.red() * 8, robot.jewelColorSensor.green() * 8, robot.jewelColorSensor.blue() * 8, robot.hsvValues);
 
                 robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_DOWN);
-                telemetry.addData("Encoder count", robot.leftBackDrive.getCurrentPosition());
 
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
@@ -149,6 +150,7 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 else{
                     robot.arrayDrive(0,0,0,0);
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
                 break;
@@ -161,16 +163,18 @@ public class BotmanAutoBlueFarSide extends OpMode {
                 else if (robot.heading() >= -15){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
                 break;
 
             //This case simply moves the robot forward 8 inches
             case MOVE:
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target - 500){
                     robot.driveByGyro(0.3, -15);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE_RIGHT;
                 }
@@ -216,8 +220,8 @@ public class BotmanAutoBlueFarSide extends OpMode {
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
-                    target = robot.leftBackDrive.getCurrentPosition();
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.BACKUP;
                 }
 

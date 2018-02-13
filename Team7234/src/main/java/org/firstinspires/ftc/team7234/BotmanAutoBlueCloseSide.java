@@ -102,6 +102,8 @@ public class BotmanAutoBlueCloseSide extends OpMode {
             telemetry.addData("VuMark", "not visible");
         }
         relicVuMark.vuMark = RelicRecoveryVuMark.from(relicVuMark.relicTemplate);
+        telemetry.addData("Encoder:", robot.leftBackDrive.getCurrentPosition());
+        telemetry.addData("Case:", programState);
         telemetry.addData("Hue:", robot.hsvValues[0]);
         telemetry.addData("Saturation:", robot.hsvValues[1]);
         telemetry.addData("Value:", robot.hsvValues[2]);
@@ -149,6 +151,7 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 else if(robot.heading() <= 0){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
                 break;
@@ -161,16 +164,18 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 else if (robot.heading() >= 0){
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
                     robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
                 break;
 
             //This case simply moves the robot forward 8 inches
             case MOVE:
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target - 500){
                     robot.driveByGyro(0.3, 0);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE_RIGHT;
                 }
@@ -195,10 +200,11 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 }
                 break;*/
             case MOVE_RIGHT:
-                if(robot.heading() <= -90){
+                if(robot.heading() <= 90){
                     robot.arrayDrive(-0.3,0.3,-0.3,0.3);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
                     target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.SCORE;
                 }
@@ -218,7 +224,7 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
 
-                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(3)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
@@ -229,7 +235,7 @@ public class BotmanAutoBlueCloseSide extends OpMode {
                 break;
 
             case BACKUP:
-                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(-2)){
+                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-1)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
