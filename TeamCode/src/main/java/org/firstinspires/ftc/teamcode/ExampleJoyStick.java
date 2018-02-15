@@ -1,4 +1,4 @@
-/* Copyright (c) 2014, 2015 Qualcomm Technologies Inc
+/* Copyright (c) 2015 Qualcomm Technologies Inc
 
 All rights reserved.
 
@@ -31,42 +31,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
 
-/**
- * Demonstrates empty OpMode
- */
-@Autonomous(name = "Blank OpMode", group = "Example")
-@Disabled
-public class BlankOpModeIterative extends OpMode {
+@TeleOp(name = "Example Joystick", group = "Example")
+//@Disabled
 
-    private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+public class ExampleJoyStick extends OpMode {
+
+    double x, y, angle;
 
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status:", "Robot is Initialized");
     }
-
 
     @Override
     public void init_loop() { }
 
 
     @Override
-    public void start() {
-        runtime.reset();
-    }
-
-
-    @Override
     public void loop() {
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        //Positive values for x axis are joystick right
+        //Positive values for y axis are joystick down
+        x = Range.clip(-gamepad1.right_stick_y,-1,1);
+        y = Range.clip(gamepad1.right_stick_x,-1,1);
+        angle = Math.atan2(y,x);
+        angle = angle >= 0 ? angle : (2*Math.PI) + angle;
+
+        // send the info back to driver station using telemetry function.
+        telemetry.addData("x", x);
+        telemetry.addData("y", y);
+        telemetry.addData("Angle", Math.toDegrees(angle));
     }
 
 
     @Override
-    public void stop() { }
+    public void stop() {
+
+    }
 }

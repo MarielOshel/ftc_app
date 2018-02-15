@@ -35,6 +35,7 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
@@ -49,6 +50,7 @@ public class BotmanAutoRedFarSide extends OpMode {
     RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
     HardwareBotman robot = new HardwareBotman();
+    double target;
 
 
     //This sets up an enumeration statement that we use to run the robot
@@ -72,7 +74,7 @@ public class BotmanAutoRedFarSide extends OpMode {
     //sets up our camera as a sensor
     @Override
     public void init() {
-        robot.init(hardwareMap, true);
+        robot.init(hardwareMap, true, DcMotor.ZeroPowerBehavior.FLOAT);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
@@ -102,6 +104,8 @@ public class BotmanAutoRedFarSide extends OpMode {
             telemetry.addData("VuMark", "not visible");
         }
         relicVuMark.vuMark = RelicRecoveryVuMark.from(relicVuMark.relicTemplate);
+        telemetry.addData("Encoder:", robot.leftBackDrive.getCurrentPosition());
+        telemetry.addData("Case:", programState);
         telemetry.addData("Hue:", robot.hsvValues[0]);
         telemetry.addData("Saturation:", robot.hsvValues[1]);
         telemetry.addData("Value:", robot.hsvValues[2]);
@@ -148,6 +152,8 @@ public class BotmanAutoRedFarSide extends OpMode {
                 }
                 else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.OTHER_MOVE;
                 }
                 break;
@@ -157,28 +163,44 @@ public class BotmanAutoRedFarSide extends OpMode {
                 if(robot.heading() <= 10){
                     robot.arrayDrive(-0.3, 0.3, -0.3, 0.3);
                 }
-                else if (robot.heading() >= 0){
+                else{
                     robot.jewelPusher.setPosition(robot.JEWEL_PUSHER_UP);
-                    robot.arrayDrive(0.3, -0.3, 0.3, -0.3);
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.OTHER_MOVE;
                 }
                 break;
 
             case OTHER_MOVE:
-                if(robot.heading() <= 165){
+                if(robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-1)){
+                    robot.driveByGyro(-0.3, 0);
+                }
+                else{
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
+                    programState = currentState.TURN_AROUND;
+                }
+                break;
+
+            case TURN_AROUND:
+                if(robot.heading() >= -180){
                     robot.arrayDrive(0.3,-0.3,0.3,-0.3);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE;
                 }
+                break;
+
             //This case simply moves the robot forward 8 inches
             case MOVE:
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
-                    robot.driveByGyro(0.3, 165);
+                if (robot.leftBackDrive.getCurrentPosition() >= target - 500){
+                    robot.driveByGyro(0.3, -190);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.MOVE_RIGHT;
                 }
                 break; //remove after testing
@@ -203,6 +225,7 @@ public class BotmanAutoRedFarSide extends OpMode {
                 break;*/
             case MOVE_RIGHT:
                 robot.arrayDrive(0,0,0,0);
+                target = robot.leftBackDrive.getCurrentPosition();
                 programState = currentState.SCORE;
                 break;
 
@@ -219,21 +242,19 @@ public class BotmanAutoRedFarSide extends OpMode {
                 robot.leftClaw.setPosition(robot.LEFT_GRIPPER_OPEN);
                 robot.rightClaw.setPosition(robot.RIGHT_GRIPPER_OPEN);
 
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() <= robot.ticsPerInch(8)){
+                if (robot.leftBackDrive.getCurrentPosition() >= target + robot.ticsPerInch(3)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{
+                    robot.arrayDrive(0,0,0,0);
+                    target = robot.leftBackDrive.getCurrentPosition();
                     programState = currentState.BACKUP;
                 }
 
                 break;
 
             case BACKUP:
-                robot.arrayDrive(0,0,0,0);
-                robot.resetEncoders();
-                if (robot.leftBackDrive.getCurrentPosition() >= robot.ticsPerInch(-2)){
+                if (robot.leftBackDrive.getCurrentPosition() <= target + robot.ticsPerInch(-2)){
                     robot.arrayDrive(0.5,0.5,0.5,0.5);
                 }
                 else{

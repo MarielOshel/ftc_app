@@ -26,55 +26,71 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.firstinspires.ftc.teamcode.Vuforia;
+
+package org.firstinspires.ftc.team535;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.vuforia.VuMarkTarget;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
+/**
+ * This file contains an example of an iterative (Non-Linear) "OpMode".
+ * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
+ * The names of OpModes appear on the menu of the FTC Driver Station.
+ * When an selection is made from the menu, the corresponding OpMode
+ * class is instantiated on the Robot Controller and executed.
+ *
+ * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
+ * It includes all the skeletal structure that all iterative OpModes contain.
+ *
+ * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+ */
 
-@Autonomous(name = "Relic VuMarkBot Id", group = "Vuforia")
-//@Disabled
-public class RelicVuMarkBotIdentification extends OpMode {
+@Autonomous(name="TOBORBleuSideRSAutonomous", group="Autonomous")
+@Disabled
+public class ToborBleuSideRSAutonomous extends OpMode
+{
+    public RelicRecoveryVuMark roboLocation;
+    
 
-    public static final String TAG = "Vuforia VuMark Sample";
-    //private OpenGLMatrix pose = null;
-    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
-
-    RelicVuMarkBot robot = new RelicVuMarkBot();
+    HardwareTOBOR robo = new HardwareTOBOR();
+public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spitout, end }
 
     @Override
     public void init() {
-        robot.vuforiaInit(hardwareMap);
+        telemetry.addData("Status", "Initialized");
+    robo.initRobo(hardwareMap);
+        robo.initVuforia();
+
     }
 
+
     @Override
-    public void start() {
-        robot.startVuforia();
+    public void init_loop() {
+
+    }
+
+
+
+    @Override
+    public void start(){
+
     }
 
     @Override
     public void loop() {
-
-        if (robot.readKey() != RelicRecoveryVuMark.UNKNOWN) {
-            vuMark = robot.readKey();
-            telemetry.addData("VuMark", "%s visible", vuMark);
-            //pose = robot.readPosition();
-            //telemetry.addData("Pose", format(pose));
-        } else {
-            telemetry.addData("VuMark", "not visible");
-            telemetry.addData("VuMark", "%s saved", vuMark);
-        }
     }
 
     @Override
     public void stop() {
-        robot.stopVuforia();
     }
 
-
-    String format(OpenGLMatrix transformationMatrix) {
-        return (transformationMatrix != null) ? transformationMatrix.formatAsTransform() : "null";
-    }
 }

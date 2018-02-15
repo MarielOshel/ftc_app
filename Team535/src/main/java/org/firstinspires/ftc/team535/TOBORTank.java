@@ -39,33 +39,24 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "TOBOR Tank Drive", group = "Teleop")
-@Disabled
+//@Disabled
 
 public class TOBORTank extends OpMode {
 
-    DcMotor FRMotor;
-    DcMotor FLMotor;
-    DcMotor BRMotor;
-    DcMotor BLMotor;
-    DcMotor rightTrack;
-    DcMotor leftTrack;
-    Servo RPlate;
-    Servo LPlate;
+    HardwareTOBOR robo = new HardwareTOBOR();
+    double speedControl = 1;
+    boolean toggleR = false;
+    boolean runningR = false;
+    boolean toggleL = false;
+    boolean runningL = false;
+
 
     @Override
     public void init() {
-        FRMotor = hardwareMap.dcMotor.get("FRight");
-        FLMotor = hardwareMap.dcMotor.get("FLeft");
-        BRMotor = hardwareMap.dcMotor.get("BRight");
-        BLMotor = hardwareMap.dcMotor.get("BLeft");
-        //rightTrack = hardwareMap.dcMotor.get("rTrack");
-        //leftTrack = hardwareMap.dcMotor.get("lTrack");
 
-
-        FRMotor.setDirection(DcMotor.Direction.REVERSE);
-        BRMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightTrack.setDirection(DcMotor.Direction.REVERSE);
+        robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
+
     }
 
     @Override
@@ -74,60 +65,93 @@ public class TOBORTank extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.right_trigger>=0.1)
+        if (gamepad1.dpad_down)
         {
-            BLMotor.setPower(-1*gamepad1.left_trigger);
-            BRMotor.setPower(-1*gamepad1.left_trigger);
-            FRMotor.setPower(1*gamepad1.left_trigger);
-            FLMotor.setPower(1*gamepad1.left_trigger);
-        }
-        else if (gamepad1.left_trigger>=0.1)
-        {
-            BLMotor.setPower(1*gamepad1.left_trigger);
-            BRMotor.setPower(1*gamepad1.left_trigger);
-            FRMotor.setPower(-1*gamepad1.left_trigger);
-            FLMotor.setPower(-1*gamepad1.left_trigger);
-        }
-        else
-        {
-            FRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
-            BRMotor.setPower(Range.clip(gamepad1.right_stick_y, -1, 1));
-            FLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
-            BLMotor.setPower(Range.clip(gamepad1.left_stick_y, -1, 1));
+            speedControl = 0.5;
         }
 
-        // send the info back to driver station using telemetry function.
-        if (gamepad1.left_bumper)
+        if (gamepad1.dpad_up)
         {
-            rightTrack.setPower(-1);
-            leftTrack.setPower(-1);
-        }
-        if (gamepad1.right_bumper)
-        {
-            rightTrack.setPower(1);
-            leftTrack.setPower(1);
+            speedControl = 1;
         }
 
-        if (gamepad1.a)
-        {
-            RPlate.setPosition(RPlate.getPosition()+0.002);
-            LPlate.setPosition(LPlate.getPosition()-0.002);
+        if (gamepad1.right_trigger >= 0.1) {
+            robo.strafeRight(gamepad1.right_trigger*speedControl);
+        } else if (gamepad1.left_trigger >= 0.1) {
+            robo.strafeLeft(gamepad1.left_trigger*speedControl);
+        } else {
+            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
+            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
+            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
+            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
         }
-        if (gamepad1.b)
+
+        if (toggleR)
         {
-            RPlate.setPosition(RPlate.getPosition()-0.002);
-            LPlate.setPosition(LPlate.getPosition()+0.002);
+            if (gamepad2.right_bumper)
+            {
+                runningR = !runningR;
+                toggleR = false;
+                runningL = false;
+            }
         }
+        else if (!gamepad2.right_bumper)
+        {
+            toggleR = true;
+        }
+
+        if (toggleL)
+        {
+            if (gamepad2.left_bumper)
+            {
+                runningL = !runningL;
+                runningR = false;
+                toggleL = false;
+            }
+        }
+        else if (!gamepad2.left_bumper)
+        {
+            toggleL = true;
+        }
+
+        if (runningR)
+        {
+            robo.rightTrack.setPower(1);
+            robo.leftTrack.setPower(1);
+        }
+        else if (runningL)
+        {
+            robo.rightTrack.setPower(-1);
+            robo.leftTrack.setPower(-1);
+        }
+        else if (!runningL && !runningR)
+        {
+            robo.rightTrack.setPower(0);
+            robo.leftTrack.setPower(0);
+        }
+
+        if (gamepad2.a)
+        {
+            robo.RPlate.setPosition(.08);
+            robo.LPlate.setPosition(1);
+        }
+        else if (gamepad2.b)
+        {
+            robo.RPlate.setPosition(.81);
+            robo.LPlate.setPosition(.27);
+        }
+        telemetry.addData("RPlate", robo.RPlate.getPosition());
+        telemetry.addData("LPlate", robo.LPlate.getPosition());
     }
 
 
     @Override
     public void stop() {
-        FRMotor.setPower(0);
-        BRMotor.setPower(0);
-        FLMotor.setPower(0);
-        BLMotor.setPower(0);
-        rightTrack.setPower(0);
-        leftTrack.setPower(0);
+        robo.FRMotor.setPower(0);
+        robo.BRMotor.setPower(0);
+        robo.FLMotor.setPower(0);
+        robo.BLMotor.setPower(0);
+        robo.rightTrack.setPower(0);
+        robo.leftTrack.setPower(0);
     }
 }
