@@ -118,13 +118,13 @@ public class HardwareBotman
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);// Set to TWISTCW if using AndyMark motors
             rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         }
         else{
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);// Set to TWISTCW if using AndyMark motors
             rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         }
 
@@ -214,9 +214,9 @@ public class HardwareBotman
 
     void mecanumDrive(double angle, double magnitude, double rotation){  //Calculates and sends values to wheels
         //region Exceptions
-        if(angle> 1.5 *Math.PI || angle< -0.5*Math.PI){
+        /*if(angle> 1.5 *Math.PI || angle< -0.5*Math.PI){
             throw new IllegalArgumentException("Angle is outside range [-pi/2, 3pi/2]. Invalid Value is: " + Double.toString(angle));
-        }
+        }*/ //Realized exception is unecessary, as angle is never called outside of trigonometric functions
 
         if(magnitude<0 || magnitude>1){
             throw new IllegalArgumentException("Magnitude is outside range [0, 1]. Invalid Value is: " + Double.toString(magnitude));
