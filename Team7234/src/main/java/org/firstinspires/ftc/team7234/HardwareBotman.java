@@ -254,9 +254,12 @@ public class HardwareBotman
     }
 
     double[] mecanumDeltas(double x, double y){
-        double[] out = { 0, 0, 0, 0
-
-        } //TODO Finish This Algorithm
+        double[] out = {
+                ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Front
+                ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0), //Right Front
+                -ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Back
+                -ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0) //Right Back
+        };
         return out;
     }
     //endregion

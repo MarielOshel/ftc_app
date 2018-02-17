@@ -16,6 +16,8 @@ public class RedCloseAuto7234 extends OpMode{
     public RelicRecoveryVuMark keyFinder;
     HardwareBotman robot = new HardwareBotman();
 
+    private boolean firstloop;
+
     public enum currentState {
         PREP,
         JEWEL,
@@ -23,6 +25,7 @@ public class RedCloseAuto7234 extends OpMode{
         RETURN,
         MOVETOBOX,
         ALIGN,
+        RELEASE
 
     }
     private currentState state = currentState.PREP;
@@ -38,8 +41,7 @@ public class RedCloseAuto7234 extends OpMode{
     private double refLB;
     private double refRB;
 
-    private double targetAVG;
-
+    private double[] deltas;
 
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
@@ -48,6 +50,9 @@ public class RedCloseAuto7234 extends OpMode{
         robot.init(hardwareMap, false, DcMotor.ZeroPowerBehavior.BRAKE);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
+        firstloop = true;
+        assignRefererence();
+        deltas = robot.mecanumDeltas(0,0);
     }
 
     @Override
@@ -122,30 +127,61 @@ public class RedCloseAuto7234 extends OpMode{
                 }
                 else{
                     robot.mecanumDrive(0.0,0.0,0.0);
-
-                    refLB = robot.leftBackDrive.getCurrentPosition();
-                    refLF = robot.leftFrontDrive.getCurrentPosition();
-                    refRB = robot.rightBackDrive.getCurrentPosition();
-                    refRF = robot.rightFrontDrive.getCurrentPosition();
-
-
-
+                    assignRefererence();
+                    deltas = robot.mecanumDeltas(0.0, -37.0);
                     state = currentState.MOVETOBOX;
                 }
                 break;
             case MOVETOBOX:
+                double rot;
                 if (robot.heading() < -2.0){
-                    double angle = -0.2;
+                    rot = -0.2;
                 }
                 else if (robot.heading() > 2.0){
-                    double angle = 0.2;
+
+                    rot = 0.2;
                 }
                 else{
-                    double angle = 0.0;
+                    rot = 0.0;
                 }
 
-        }
+                if (robot.leftFrontDrive.getCurrentPosition() >= refLF + deltas[0]){
+                    robot.mecanumDrive(Math.PI, 0.5, rot);
+                }
+                else {
+                    robot.mecanumDrive(0.0, 0.0, 0.0);
+                    assignRefererence();
 
+                    state = currentState.ALIGN;
+                }
+                break;
+            case ALIGN:
+                double htarget = 0.0;
+                if(firstloop){
+                    assignRefererence();
+
+                    htarget = (robot.heading()+45.0+180.0)%360.0-180.0;
+                    firstloop = false;
+                }
+                else{
+                    if (robot.heading() >= htarget - 3.0 && robot.heading() <= htarget +3.0){
+                        state = currentState.RELEASE;
+                    }
+                }
+                break;
+            case RELEASE:
+                robot.gripperSet(HardwareBotman.GripperState.HALFWAY);
+                break;
+        } //state switch
+
+    } //loop
+
+    private void assignRefererence(){
+
+        refLB = robot.leftBackDrive.getCurrentPosition();
+        refLF = robot.leftFrontDrive.getCurrentPosition();
+        refRB = robot.rightBackDrive.getCurrentPosition();
+        refRF = robot.rightFrontDrive.getCurrentPosition();
     }
 
 }
