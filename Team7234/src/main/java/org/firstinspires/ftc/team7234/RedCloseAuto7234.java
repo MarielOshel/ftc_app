@@ -33,11 +33,19 @@ public class RedCloseAuto7234 extends OpMode{
 
     private boolean keyRead = false;
 
+    private double refLF;
+    private double refRF;
+    private double refLB;
+    private double refRB;
+
+    private double targetAVG;
+
+
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
     @Override
     public void init() {
-        robot.init(hardwareMap, true, DcMotor.ZeroPowerBehavior.FLOAT);
+        robot.init(hardwareMap, false, DcMotor.ZeroPowerBehavior.BRAKE);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
     }
@@ -114,11 +122,27 @@ public class RedCloseAuto7234 extends OpMode{
                 }
                 else{
                     robot.mecanumDrive(0.0,0.0,0.0);
+
+                    refLB = robot.leftBackDrive.getCurrentPosition();
+                    refLF = robot.leftFrontDrive.getCurrentPosition();
+                    refRB = robot.rightBackDrive.getCurrentPosition();
+                    refRF = robot.rightFrontDrive.getCurrentPosition();
+
+
+
                     state = currentState.MOVETOBOX;
                 }
                 break;
             case MOVETOBOX:
-
+                if (robot.heading() < -2.0){
+                    double angle = -0.2;
+                }
+                else if (robot.heading() > 2.0){
+                    double angle = 0.2;
+                }
+                else{
+                    double angle = 0.0;
+                }
 
         }
 

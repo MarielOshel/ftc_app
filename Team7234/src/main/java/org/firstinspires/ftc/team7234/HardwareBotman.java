@@ -252,6 +252,13 @@ public class HardwareBotman
         }
         //endregion
     }
+
+    double[] mecanumDeltas(double x, double y){
+        double[] out = { 0, 0, 0, 0
+
+        } //TODO Finish This Algorithm
+        return out;
+    }
     //endregion
 
     //Function to limit values to a range
