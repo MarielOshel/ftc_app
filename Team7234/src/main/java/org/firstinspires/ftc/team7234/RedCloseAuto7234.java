@@ -165,7 +165,11 @@ public class RedCloseAuto7234 extends OpMode{
                 }
                 else{
                     if (robot.heading() >= htarget - 3.0 && robot.heading() <= htarget +3.0){
+                        robot.mecanumDrive(0.0,0.0,0.0);
                         state = currentState.RELEASE;
+                    }
+                    else {
+                        robot.mecanumDrive(0.0, 0.0,-0.3);
                     }
                 }
                 break;
