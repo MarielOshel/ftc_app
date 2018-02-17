@@ -2,13 +2,14 @@ package org.firstinspires.ftc.team7234;
 
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 
-
+@Autonomous(name = "Red Close", group = "DB")
 public class RedCloseAuto7234 extends OpMode{
 
     private RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
