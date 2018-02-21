@@ -25,8 +25,8 @@ public class RedFarAuto7234 extends OpMode{
         RETURN,
         MOVETOBOX,
         ALIGN,
-        RELEASE
-
+        RELEASE,
+	RETREAT
     }
     private currentState state = currentState.PREP;
 
@@ -53,12 +53,12 @@ public class RedFarAuto7234 extends OpMode{
         firstloop = true;
         assignRefererence();
         deltas = robot.mecanumDeltas(0,0);
-    }
+    } //init
 
     @Override
     public void start(){
         relicVuMark.start();
-    }
+    } //start
     @Override
     public void loop(){
 
@@ -156,16 +156,15 @@ public class RedFarAuto7234 extends OpMode{
                 }
                 break;
             case ALIGN:
-                double htarget = 0.0;
                 if(firstloop){
-                    assignRefererence();
-
-                    htarget = (robot.heading()+45.0+180.0)%360.0-180.0;
+                    double htarget = 0.0;
+                    htarget = (robot.heading()+135.0+180.0)%360.0-180.0;
                     firstloop = false;
                 }
                 else{
                     if (robot.heading() >= htarget - 3.0 && robot.heading() <= htarget +3.0){
                         robot.mecanumDrive(0.0,0.0,0.0);
+			assignReference();
                         state = currentState.RELEASE;
                     }
                     else {
@@ -175,7 +174,15 @@ public class RedFarAuto7234 extends OpMode{
                 break;
             case RELEASE:
                 robot.gripperSet(HardwareBotman.GripperState.HALFWAY);
+		state = currentState.RETREAT;
                 break;
+	    case RETREAT:
+		if(robot.leftBackDrive.getCurrentPosition() >= refLB + mecanumDeltas(0, -3)[0]){
+		    robot.mecanumDrive(Math.PI, 0.5, 0.0);
+		}
+		else{
+		    robot.mecanumDrive(0,0,0);
+		}
         } //state switch
 
     } //loop
@@ -186,6 +193,6 @@ public class RedFarAuto7234 extends OpMode{
         refLF = robot.leftFrontDrive.getCurrentPosition();
         refRB = robot.rightBackDrive.getCurrentPosition();
         refRF = robot.rightFrontDrive.getCurrentPosition();
-    }
+    } //assignReference
 
 }
