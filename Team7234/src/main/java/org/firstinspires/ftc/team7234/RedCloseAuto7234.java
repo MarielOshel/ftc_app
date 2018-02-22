@@ -25,7 +25,8 @@ public class RedCloseAuto7234 extends OpMode{
         RETURN,
         MOVETOBOX,
         ALIGN,
-        RELEASE
+        RELEASE,
+        RETREAT
 
     }
     private currentState state = currentState.PREP;
@@ -175,6 +176,14 @@ public class RedCloseAuto7234 extends OpMode{
                 break;
             case RELEASE:
                 robot.gripperSet(HardwareBotman.GripperState.HALFWAY);
+                break;
+            case RETREAT:
+                if(robot.leftBackDrive.getCurrentPosition() >= refLB + robot.mecanumDeltas(0, -3)[0]){
+                    robot.mecanumDrive(Math.PI, 0.5, 0.0);
+                }
+                else{
+                    robot.mecanumDrive(0,0,0);
+                }
                 break;
         } //state switch
 

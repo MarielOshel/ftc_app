@@ -26,7 +26,7 @@ public class RedFarAuto7234 extends OpMode{
         MOVETOBOX,
         ALIGN,
         RELEASE,
-	RETREAT
+	    RETREAT
     }
     private currentState state = currentState.PREP;
 
@@ -41,6 +41,8 @@ public class RedFarAuto7234 extends OpMode{
     private double refLB;
     private double refRB;
 
+    private double htarget = 0.0;
+
     private double[] deltas;
 
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
@@ -51,7 +53,7 @@ public class RedFarAuto7234 extends OpMode{
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
         firstloop = true;
-        assignRefererence();
+        assignReference();
         deltas = robot.mecanumDeltas(0,0);
     } //init
 
@@ -66,6 +68,7 @@ public class RedFarAuto7234 extends OpMode{
             vuMark = relicVuMark.readKey();
             keyRead = true;
         }
+        telemetry.addData("Key Is: ", vuMark.toString());
 
         switch (state){
             case PREP:
@@ -127,7 +130,7 @@ public class RedFarAuto7234 extends OpMode{
                 }
                 else{
                     robot.mecanumDrive(0.0,0.0,0.0);
-                    assignRefererence();
+                    assignReference();
                     deltas = robot.mecanumDeltas(0.0, -37.0);
                     state = currentState.MOVETOBOX;
                 }
@@ -150,21 +153,20 @@ public class RedFarAuto7234 extends OpMode{
                 }
                 else {
                     robot.mecanumDrive(0.0, 0.0, 0.0);
-                    assignRefererence();
+                    assignReference();
 
                     state = currentState.ALIGN;
                 }
                 break;
             case ALIGN:
                 if(firstloop){
-                    double htarget = 0.0;
                     htarget = (robot.heading()+135.0+180.0)%360.0-180.0;
                     firstloop = false;
                 }
                 else{
                     if (robot.heading() >= htarget - 3.0 && robot.heading() <= htarget +3.0){
                         robot.mecanumDrive(0.0,0.0,0.0);
-			assignReference();
+			        assignReference();
                         state = currentState.RELEASE;
                     }
                     else {
@@ -174,21 +176,21 @@ public class RedFarAuto7234 extends OpMode{
                 break;
             case RELEASE:
                 robot.gripperSet(HardwareBotman.GripperState.HALFWAY);
-		state = currentState.RETREAT;
-                break;
-	    case RETREAT:
-		if(robot.leftBackDrive.getCurrentPosition() >= refLB + mecanumDeltas(0, -3)[0]){
-		    robot.mecanumDrive(Math.PI, 0.5, 0.0);
-		}
-		else{
-		    robot.mecanumDrive(0,0,0);
-		}
+		        state = currentState.RETREAT;
+		        break;
+	        case RETREAT:
+		        if(robot.leftBackDrive.getCurrentPosition() >= refLB + robot.mecanumDeltas(0, -3)[0]){
+	    	        robot.mecanumDrive(Math.PI, 0.5, 0.0);
+	    	    }
+	    	    else{
+	    	        robot.mecanumDrive(0,0,0);
+	    	    }
+	    	    break;
         } //state switch
 
     } //loop
 
-    private void assignRefererence(){
-
+    private void assignReference(){
         refLB = robot.leftBackDrive.getCurrentPosition();
         refLF = robot.leftFrontDrive.getCurrentPosition();
         refRB = robot.rightBackDrive.getCurrentPosition();
