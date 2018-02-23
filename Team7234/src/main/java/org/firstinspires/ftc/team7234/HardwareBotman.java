@@ -65,8 +65,8 @@ public class HardwareBotman
     static final double JEWEL_PUSHER_UP = 0.32;
     static final double JEWEL_PUSHER_DOWN = 1;
 
-    static final double RELIC_ARM_BOTTOM = 0.0;
-    static final double RELIC_ARM_TOP = 1.0;
+    private static final double RELIC_ARM_BOTTOM = 0.0;
+    private static final double RELIC_ARM_TOP = 1.0;
 
     //endregion
 
@@ -255,10 +255,10 @@ public class HardwareBotman
 
     double[] mecanumDeltas(double x, double y){
         return new double[]{
-                ticsPerInch(x)/Math.sqrt(2.0)+ticsPerInch(y)/Math.sqrt(2.0), //Left Front
-                ticsPerInch(x)/Math.sqrt(2.0)-ticsPerInch(y)/Math.sqrt(2.0), //Right Front
-                -ticsPerInch(x)/Math.sqrt(2.0)+ticsPerInch(y)/Math.sqrt(2.0), //Left Back
-                -ticsPerInch(x)/Math.sqrt(2.0)-ticsPerInch(y)/Math.sqrt(2.0) //Right Back
+                ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Front
+                ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0), //Right Front
+                -ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Back
+                -ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0) //Right Back
         };
     }
     //endregion
@@ -292,7 +292,7 @@ public class HardwareBotman
     }
 
     double ticsPerInch(double distance){
-        return (1120.0*distance/(4.0*Math.PI));
+        return (560.0*distance/(4.0*Math.PI));
     }
 
     void resetEncoders() {

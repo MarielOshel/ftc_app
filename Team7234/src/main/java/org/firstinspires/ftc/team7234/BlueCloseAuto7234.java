@@ -9,13 +9,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-import java.util.logging.Logger;
 
+@Autonomous(name = "NEW Blue Close", group = "DB")
+public class BlueCloseAuto7234 extends OpMode{
 
-@Autonomous(name = "NEW Red Close", group = "DB")
-public class RedCloseAuto7234 extends OpMode{
-
-    private static final String logTag = RedCloseAuto7234.class.getName();
+    private static final String logTag = BlueCloseAuto7234.class.getName();
 
     private RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
@@ -91,7 +89,7 @@ public class RedCloseAuto7234 extends OpMode{
         switch (state){
             case PREP:
                 if (!robot.armLimit.getState()){
-                    gripperState = HardwareBotman.GripperState.OPEN; //Opposite of intent due to recent hardware changes TODO: Fix this for all programs in next release
+                    gripperState = HardwareBotman.GripperState.CLOSED;
                     robot.gripperSet(gripperState);
                     robot.arm.setPower(0.2);
                 }
@@ -116,13 +114,13 @@ public class RedCloseAuto7234 extends OpMode{
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
-                    state = currentState.TWISTCW;
+                    state = currentState.TWISTCCW;
                     jewelString = "BLUE";
                     Log.i(logTag, "Jewel Removed, color seen was " + jewelString);
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
-                    state = currentState.TWISTCCW;
+                    state = currentState.TWISTCW;
                     jewelString = "RED";
                     Log.i(logTag, "Jewel Removed, color seen was " + jewelString);
                 }
@@ -163,7 +161,7 @@ public class RedCloseAuto7234 extends OpMode{
                 else{
                     robot.mecanumDrive(0.0,0.0,0.0);
                     assignRefererence();
-                    deltas = robot.mecanumDeltas(0.0, -37.0);
+                    deltas = robot.mecanumDeltas(0.0, 37.0);
                     Log.i(logTag, "Return Completed, moving to cryptobox."
                             + "\nCurrent Heading is: "
                             + robot.heading()
@@ -211,7 +209,7 @@ public class RedCloseAuto7234 extends OpMode{
             case ALIGN:
 
                 if(firstloop){
-                    htarget = (robot.heading()+45.0+180.0)%360.0-180.0;
+                    htarget = (robot.heading()-45.0+180.0)%360.0-180.0;
                     firstloop = false;
                 }
                 else{
