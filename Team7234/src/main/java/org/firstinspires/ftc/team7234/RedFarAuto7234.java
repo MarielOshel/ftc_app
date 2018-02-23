@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team7234;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 @Autonomous(name = "Red Far", group = "DB")
 public class RedFarAuto7234 extends OpMode{
+    private static final String logTag = RedCloseAuto7234.class.getName();
 
     private RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
@@ -43,6 +45,7 @@ public class RedFarAuto7234 extends OpMode{
     private double refLB;
     private double refRB;
 
+    private String jewelString;
     private double htarget = 0.0;
 
     private double[] deltas;
@@ -66,10 +69,16 @@ public class RedFarAuto7234 extends OpMode{
     @Override
     public void loop(){
 
-        telemetry.addData("Key Is: ", vuMark.toString());
+        //region TELEMETRY
+        telemetry.addData("Program Position: ", state.toString());
+        telemetry.addLine();
+        telemetry.addData("Gripper Position: ", gripperState.toString());
+        telemetry.addData("Key Seen is: ", vuMark.toString());
+        //endregion
 
         if (!keyRead && relicVuMark.readKey() != RelicRecoveryVuMark.UNKNOWN){
             vuMark = relicVuMark.readKey();
+            Log.i(logTag, "vuMark Found, state is: " + vuMark.toString());
             keyRead = true;
         }
 
@@ -85,6 +94,7 @@ public class RedFarAuto7234 extends OpMode{
                     robot.arm.setPower(0.0);
                     robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_DOWN);
                     state = currentState.JEWEL;
+                    Log.i(logTag, "Preparation Completed, Gripper State is: " + gripperState.toString());
                 }
                 break;
             case JEWEL:
@@ -100,10 +110,14 @@ public class RedFarAuto7234 extends OpMode{
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
                     state = currentState.TWISTCW;
+                    jewelString = "BLUE";
+                    Log.i(logTag, "Jewel Removed, color seen was " + jewelString);
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
                     state = currentState.TWISTCCW;
+                    jewelString = "RED";
+                    Log.i(logTag, "Jewel Removed, color seen was " + jewelString);
                 }
                 break;
             case TWISTCW:
@@ -113,6 +127,9 @@ public class RedFarAuto7234 extends OpMode{
                 else{
                     robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_UP);
                     robot.mecanumDrive(0.0, 0.0, 0.0);
+                    Log.i(logTag, "Clockwise Twist Completed, returing to orientation.\nCurrent Heading is: "
+                            + robot.heading()
+                    );
                     state = currentState.RETURN;
                 }
                 break;
@@ -123,6 +140,9 @@ public class RedFarAuto7234 extends OpMode{
                 else{
                     robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_UP);
                     robot.mecanumDrive(0.0, 0.0, 0.0);
+                    Log.i(logTag, "Counterclockwise Twist Completed, returing to orientation.\nCurrent Heading is: "
+                            + robot.heading()
+                    );
                     state = currentState.RETURN;
                 }
                 break;
@@ -137,6 +157,9 @@ public class RedFarAuto7234 extends OpMode{
                     robot.mecanumDrive(0.0,0.0,0.0);
                     assignReference();
                     deltas = robot.mecanumDeltas(0.0, -37.0);
+                    Log.i(logTag, "Return Completed, moving to cryptobox.\nCurrent Heading is: "
+                            + robot.heading()
+                    );
                     state = currentState.MOVETOBOX;
                 }
                 break;
@@ -159,7 +182,11 @@ public class RedFarAuto7234 extends OpMode{
                 else {
                     robot.mecanumDrive(0.0, 0.0, 0.0);
                     assignReference();
-
+                    Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
+                            + (refLF + deltas[0])
+                            + "\nEnding Value was: "
+                            + robot.leftFrontDrive.getCurrentPosition()
+                    );
                     state = currentState.ALIGN;
                 }
                 break;
@@ -171,7 +198,10 @@ public class RedFarAuto7234 extends OpMode{
                 else{
                     if (robot.heading() >= htarget - 3.0 && robot.heading() <= htarget +3.0){
                         robot.mecanumDrive(0.0,0.0,0.0);
-			        assignReference();
+			            assignReference();
+                        Log.i(logTag, "Alignment Completed, Releasing Glyph.\nCurrent Heading is: "
+                                + robot.heading()
+                        );
                         state = currentState.RELEASE;
                     }
                     else {
@@ -195,6 +225,16 @@ public class RedFarAuto7234 extends OpMode{
         } //state switch
 
     } //loop
+    @Override
+    public void stop(){
+        Log.i(logTag, "Autonomous Completed. \nEnding state was: "
+                + state.toString()
+                + "\nGripper State was: "
+                + gripperState.toString()
+                + "\nVumark Found was: "
+                + vuMark.toString()
+        );
+    }
 
     private void assignReference(){
         refLB = robot.leftBackDrive.getCurrentPosition();

@@ -49,7 +49,7 @@ public class RedCloseAuto7234 extends OpMode{
     private double refLB;
     private double refRB;
 
-
+    private String jewelString;
 
     private double[] deltas;
 
@@ -103,7 +103,7 @@ public class RedCloseAuto7234 extends OpMode{
                 break;
 
             case JEWEL:
-                String jewelString;
+
                 //converts RGB Reading of Color Sensor to HSV for better color detection
                 Color.RGBToHSV(
                         robot.jewelColorSensor.red()*8,
@@ -163,13 +163,24 @@ public class RedCloseAuto7234 extends OpMode{
                     robot.mecanumDrive(0.0,0.0,0.0);
                     assignRefererence();
                     deltas = robot.mecanumDeltas(0.0, -37.0);
-                    Log.i(logTag, "Return Completed, moving to cryptobox.\nCurrent Heading is: "
+                    Log.i(logTag, "Return Completed, moving to cryptobox."
+                            + "\nCurrent Heading is: "
                             + robot.heading()
+                            + "\nReference Motor is now at: "
+                            + refLF
+                            + "\nTarget is: "
+                            + (refLF + deltas[0])
                     );
                     state = currentState.MOVETOBOX;
                 }
                 break;
             case MOVETOBOX:
+                Log.v(logTag, "Moving to box, current position is: "
+                        + -robot.leftFrontDrive.getCurrentPosition()
+                        + "\nTarget is: "
+                        + (-refLF + deltas[0])
+                );
+
                 double rot;
                 if (robot.heading() < -2.0){
                     rot = -0.2;
@@ -182,8 +193,8 @@ public class RedCloseAuto7234 extends OpMode{
                     rot = 0.0;
                 }
 
-                if (robot.leftFrontDrive.getCurrentPosition() >= refLF + deltas[0]){
-                    robot.mecanumDrive(Math.PI, 0.5, rot);
+                if (-robot.leftFrontDrive.getCurrentPosition() >= -refLF + deltas[0]){
+                    robot.mecanumDrive(Math.PI, 0.3, rot);
                 }
                 else {
                     robot.mecanumDrive(0.0, 0.0, 0.0);
@@ -226,7 +237,6 @@ public class RedCloseAuto7234 extends OpMode{
                     robot.mecanumDrive(Math.PI, 0.5, 0.0);
                 }
                 else{
-                    Log.i(logTag, "Success, Locking in place");
                     robot.mecanumDrive(0,0,0);
                 }
                 break;
