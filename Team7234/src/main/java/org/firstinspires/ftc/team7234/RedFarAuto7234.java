@@ -30,6 +30,8 @@ public class RedFarAuto7234 extends OpMode{
     }
     private currentState state = currentState.PREP;
 
+    private HardwareBotman.GripperState gripperState = HardwareBotman.GripperState.HALFWAY;
+
     private static final double LEFT_DIST = 0.0; //Distance to move for left box, in inches
     private static final double CENTER_DIST = 0.0; //Distance to move for center box, in inches
     private static final double RIGHT_DIST = 0.0; //Distance to move for right box, in inches
@@ -64,16 +66,19 @@ public class RedFarAuto7234 extends OpMode{
     @Override
     public void loop(){
 
+        telemetry.addData("Key Is: ", vuMark.toString());
+
         if (!keyRead && relicVuMark.readKey() != RelicRecoveryVuMark.UNKNOWN){
             vuMark = relicVuMark.readKey();
             keyRead = true;
         }
-        telemetry.addData("Key Is: ", vuMark.toString());
+
 
         switch (state){
             case PREP:
                 if (!robot.armLimit.getState()){
-                    robot.gripperSet(HardwareBotman.GripperState.CLOSED);
+                    gripperState = HardwareBotman.GripperState.CLOSED;
+                    robot.gripperSet(gripperState);
                     robot.arm.setPower(0.2);
                 }
                 else {
@@ -175,7 +180,8 @@ public class RedFarAuto7234 extends OpMode{
                 }
                 break;
             case RELEASE:
-                robot.gripperSet(HardwareBotman.GripperState.HALFWAY);
+                gripperState = HardwareBotman.GripperState.HALFWAY;
+                robot.gripperSet(gripperState);
 		        state = currentState.RETREAT;
 		        break;
 	        case RETREAT:

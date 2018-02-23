@@ -254,13 +254,12 @@ public class HardwareBotman
     }
 
     double[] mecanumDeltas(double x, double y){
-        double[] out = {
+        return new double[]{
                 ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Front
                 ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0), //Right Front
                 -ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Back
                 -ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0) //Right Back
         };
-        return out;
     }
     //endregion
 
@@ -293,7 +292,7 @@ public class HardwareBotman
     }
 
     double ticsPerInch(double distance){
-        return (-280/Math.PI) * distance;
+        return (distance*4.0*Math.PI);
     }
 
     void resetEncoders() {

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team7234;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -8,9 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
+import java.util.logging.Logger;
 
-@Autonomous(name = "Red Close", group = "DB")
+
+@Autonomous(name = "NEW Red Close", group = "DB")
 public class RedCloseAuto7234 extends OpMode{
+
+    private static final String logTag = RedCloseAuto7234.class.getName();
 
     private RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
@@ -31,6 +36,8 @@ public class RedCloseAuto7234 extends OpMode{
     }
     private currentState state = currentState.PREP;
 
+    private HardwareBotman.GripperState gripperState = HardwareBotman.GripperState.HALFWAY;
+
     private static final double LEFT_DIST = 0.0; //Distance to move for left box, in inches
     private static final double CENTER_DIST = 0.0; //Distance to move for center box, in inches
     private static final double RIGHT_DIST = 0.0; //Distance to move for right box, in inches
@@ -41,6 +48,8 @@ public class RedCloseAuto7234 extends OpMode{
     private double refRF;
     private double refLB;
     private double refRB;
+
+
 
     private double[] deltas;
 
@@ -59,28 +68,42 @@ public class RedCloseAuto7234 extends OpMode{
     @Override
     public void start(){
         relicVuMark.start();
+        Log.i(logTag, "Vumark started");
     }
+
     @Override
     public void loop(){
 
+        //region TELEMETRY
+        telemetry.addData("Program Position: ", state.toString());
+        telemetry.addLine();
+        telemetry.addData("Gripper Position: ", gripperState.toString());
+        telemetry.addData("Key Seen is: ", vuMark.toString());
+        //endregion
+
         if (!keyRead && relicVuMark.readKey() != RelicRecoveryVuMark.UNKNOWN){
             vuMark = relicVuMark.readKey();
+            Log.i(logTag, "vuMark Found, state is: " + vuMark.toString());
             keyRead = true;
         }
 
         switch (state){
             case PREP:
                 if (!robot.armLimit.getState()){
-                    robot.gripperSet(HardwareBotman.GripperState.CLOSED);
+                    gripperState = HardwareBotman.GripperState.CLOSED;
+                    robot.gripperSet(gripperState);
                     robot.arm.setPower(0.2);
                 }
                 else {
                     robot.arm.setPower(0.0);
                     robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_DOWN);
                     state = currentState.JEWEL;
+                    Log.i(logTag, "Preparation Completed, Gripper State is: " + gripperState.toString());
                 }
                 break;
+
             case JEWEL:
+                String jewelString;
                 //converts RGB Reading of Color Sensor to HSV for better color detection
                 Color.RGBToHSV(
                         robot.jewelColorSensor.red()*8,
@@ -93,10 +116,14 @@ public class RedCloseAuto7234 extends OpMode{
                 //mistake a blue-ish lit room
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
                     state = currentState.TWISTCW;
+                    jewelString = "BLUE";
+                    Log.i(logTag, "Jewel Removed, color seen was " + jewelString);
                 }
                 //This does the same except for the color red
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
                     state = currentState.TWISTCCW;
+                    jewelString = "RED";
+                    Log.i(logTag, "Jewel Removed, color seen was " + jewelString);
                 }
                 break;
             case TWISTCW:
@@ -106,6 +133,9 @@ public class RedCloseAuto7234 extends OpMode{
                 else{
                     robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_UP);
                     robot.mecanumDrive(0.0, 0.0, 0.0);
+                    Log.i(logTag, "Clockwise Twist Completed, returing to orientation.\nCurrent Heading is: "
+                            + robot.heading()
+                    );
                     state = currentState.RETURN;
                 }
                 break;
@@ -116,6 +146,9 @@ public class RedCloseAuto7234 extends OpMode{
                 else{
                     robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_UP);
                     robot.mecanumDrive(0.0, 0.0, 0.0);
+                    Log.i(logTag, "Counterclockwise Twist Completed, returing to orientation.\nCurrent Heading is: "
+                            + robot.heading()
+                    );
                     state = currentState.RETURN;
                 }
                 break;
@@ -130,6 +163,9 @@ public class RedCloseAuto7234 extends OpMode{
                     robot.mecanumDrive(0.0,0.0,0.0);
                     assignRefererence();
                     deltas = robot.mecanumDeltas(0.0, -37.0);
+                    Log.i(logTag, "Return Completed, moving to cryptobox.\nCurrent Heading is: "
+                            + robot.heading()
+                    );
                     state = currentState.MOVETOBOX;
                 }
                 break;
@@ -152,7 +188,11 @@ public class RedCloseAuto7234 extends OpMode{
                 else {
                     robot.mecanumDrive(0.0, 0.0, 0.0);
                     assignRefererence();
-
+                    Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
+                            + (refLF + deltas[0])
+                            + "\nEnding Value was: "
+                            + robot.leftFrontDrive.getCurrentPosition()
+                    );
                     state = currentState.ALIGN;
                 }
                 break;
@@ -167,6 +207,9 @@ public class RedCloseAuto7234 extends OpMode{
                 else{
                     if (robot.heading() >= htarget - 3.0 && robot.heading() <= htarget +3.0){
                         robot.mecanumDrive(0.0,0.0,0.0);
+                        Log.i(logTag, "Alignment Completed, Releasing Glyph.\nCurrent Heading is: "
+                                + robot.heading()
+                        );
                         state = currentState.RELEASE;
                     }
                     else {
@@ -175,22 +218,33 @@ public class RedCloseAuto7234 extends OpMode{
                 }
                 break;
             case RELEASE:
-                robot.gripperSet(HardwareBotman.GripperState.HALFWAY);
+                gripperState = HardwareBotman.GripperState.HALFWAY;
+                robot.gripperSet(gripperState);
                 break;
             case RETREAT:
                 if(robot.leftBackDrive.getCurrentPosition() >= refLB + robot.mecanumDeltas(0, -3)[0]){
                     robot.mecanumDrive(Math.PI, 0.5, 0.0);
                 }
                 else{
+                    Log.i(logTag, "Success, Locking in place");
                     robot.mecanumDrive(0,0,0);
                 }
                 break;
         } //state switch
 
     } //loop
+    @Override
+    public void stop(){
+        Log.i(logTag, "Autonomous Completed. \nEnding state was: "
+                + state.toString()
+                + "\nGripper State was: "
+                + gripperState.toString()
+                + "\nVumark Found was: "
+                + vuMark.toString()
+        );
+    }
 
     private void assignRefererence(){
-
         refLB = robot.leftBackDrive.getCurrentPosition();
         refLF = robot.leftFrontDrive.getCurrentPosition();
         refRB = robot.rightBackDrive.getCurrentPosition();
