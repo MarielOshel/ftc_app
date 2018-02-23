@@ -178,7 +178,7 @@ public class RedCloseAuto7234 extends OpMode{
                 Log.v(logTag, "Moving to box, current position is: "
                         + -robot.leftFrontDrive.getCurrentPosition()
                         + "\nTarget is: "
-                        + (-refLF + deltas[0])
+                        + (-refLF + deltas[0]/2.0)
                 );
 
                 double rot;
@@ -193,14 +193,14 @@ public class RedCloseAuto7234 extends OpMode{
                     rot = 0.0;
                 }
 
-                if (-robot.leftFrontDrive.getCurrentPosition() >= -refLF + deltas[0]){
+                if (-robot.leftFrontDrive.getCurrentPosition() >= -refLF + deltas[0]/2.0){
                     robot.mecanumDrive(Math.PI, 0.3, rot);
                 }
                 else {
                     robot.mecanumDrive(0.0, 0.0, 0.0);
                     assignRefererence();
                     Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
-                            + (refLF + deltas[0])
+                            + (refLF + deltas[0]/2.0)
                             + "\nEnding Value was: "
                             + robot.leftFrontDrive.getCurrentPosition()
                     );
