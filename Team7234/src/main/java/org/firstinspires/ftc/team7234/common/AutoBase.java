@@ -9,45 +9,61 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.team7234.common.enums.AllianceColor;
 import org.firstinspires.ftc.team7234.common.enums.FieldLocation;
-
+/**
+ * This class is meant to provide a framework on which to build our autonomous for Relic Recovery
+ * @author Donald Brown
+ */
 public class AutoBase extends OpMode{
 
-    final AllianceColor allianceColor;
-    final FieldLocation fieldLocation;
-    final String logTag;
+    final AllianceColor allianceColor; //Color of the Alliance
+    final FieldLocation fieldLocation; //Location on the field, relative to the recovery zone
+    final String logTag; //Name of program extending this class, for logging purposes
 
-    final double boxDist;
-    final double theta1;
-    final double direction1;
+    final double boxDistY; //Distance Travelled, in inches, to reach the cryptobox in the front-back direction
+    final double boxDistX; //Distance Travelled, in inches, to reach the cryptobox in the left-right direction
+    final double theta1; //Angle of rotation with which to align the robot with the cryptobox
+    final double direction1; //Direction in which to travel when aligning with the cryptobox in the Y axis
+    final double direction2; //Direction in which to travel when aligning with the cryptobox in the X axis
+
 
     public AutoBase(AllianceColor allianceColor, FieldLocation fieldLocation, String logTag){
         this.allianceColor = allianceColor;
         this.fieldLocation = fieldLocation;
         this.logTag = logTag;
         if(fieldLocation == FieldLocation.CLOSE && allianceColor == AllianceColor.RED){
-            this.boxDist = -37.0;
+            this.boxDistY = -37.0;
+            this.boxDistX = 0.0;
             this.theta1 = 45.0;
             this.direction1 = Math.PI;
+            this.direction2 = 0.0;
         }
         else if (fieldLocation == FieldLocation.FAR && allianceColor == AllianceColor.RED){
-            this.boxDist = -24.0;
+            this.boxDistY = -24.0;
+            this.boxDistX = 12.0;
             this.theta1 = 225.0;
             this.direction1 = Math.PI;
+            this.direction2 = Math.PI/2.0;
         }
         else if (fieldLocation == FieldLocation.CLOSE && allianceColor ==AllianceColor.BLUE){
-            this.boxDist = 37.0;
+            this.boxDistY = 37.0;
+            this.boxDistX = 0.0;
             this.theta1 = -45.0;
             this.direction1 = 0.0;
+            this.direction2 = 0.0;
         }
         else if (fieldLocation == FieldLocation.FAR && allianceColor == AllianceColor.BLUE){
-            this.boxDist = 24.0;
+            this.boxDistY = 24.0;
+            this.boxDistX = 12.0;
             this.theta1 = 45.0;
             this.direction1 = 0.0;
+            this.direction2 = 3.0*Math.PI/2.0;
         }
         else{
-            this.boxDist = 0.0;
+            this.boxDistY = 0.0;
+            this.boxDistX = 0.0;
             this.theta1 = 0.0;
             this.direction1 = 0.0;
+            this.direction2 = 0.0;
             Log.e("AutoBase", "ERROR: Failed to initialize correctly, ending after Jewel");
         }
     }
@@ -59,9 +75,10 @@ public class AutoBase extends OpMode{
     public enum currentState {
         PREP,
         JEWEL,
-        TWISTCW, TWISTCCW,
+        TWIST_CW, TWIST_CCW,
         RETURN,
-        MOVETOBOX,
+        MOVE_TO_BOX_Y,
+        MOVE_TO_BOX_X,
         ALIGN,
         RELEASE,
         RETREAT
@@ -83,6 +100,8 @@ public class AutoBase extends OpMode{
     private double refRF;
     private double refLB;
     private double refRB;
+
+    private double rot;
 
     private double[] deltas;
     private double htarget = 0.0;
@@ -152,12 +171,12 @@ public class AutoBase extends OpMode{
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
                     switch (allianceColor){
                         case RED:
-                            state = currentState.TWISTCW;
+                            state = currentState.TWIST_CW;
                             jewelString = "BLUE";
                             Log.i(logTag, "Clockwise Turn, color seen was " + jewelString);
                             break;
                         case BLUE:
-                            state = currentState.TWISTCCW;
+                            state = currentState.TWIST_CCW;
                             jewelString = "BLUE";
                             Log.i(logTag, "CounterClockwise Turn, color seen was " + jewelString);
                             break;
@@ -168,19 +187,19 @@ public class AutoBase extends OpMode{
                 else if((robot.hsvValues[0] > 250 || robot.hsvValues[0] < 15) && (robot.hsvValues[1] > .5)) {
                     switch (allianceColor){
                         case RED:
-                            state = currentState.TWISTCCW;
+                            state = currentState.TWIST_CCW;
                             jewelString = "RED";
                             Log.i(logTag, "CounterClockwise Turn, color seen was " + jewelString);
                             break;
                         case BLUE:
-                            state = currentState.TWISTCW;
+                            state = currentState.TWIST_CW;
                             jewelString = "RED";
                             Log.i(logTag, "Clockwise Turn, color seen was " + jewelString);
                             break;
                     }
                 }
                 break;
-            case TWISTCW:
+            case TWIST_CW:
                 if (robot.heading() >= -10){
                     robot.mecanumDrive(0.0, 0.0, 0.3);
                 }
@@ -193,7 +212,7 @@ public class AutoBase extends OpMode{
                     state = currentState.RETURN;
                 }
                 break;
-            case TWISTCCW:
+            case TWIST_CCW:
                 if (robot.heading() <= 10){
                     robot.mecanumDrive(0.0, 0.0, -0.3);
                 }
@@ -216,7 +235,7 @@ public class AutoBase extends OpMode{
                 else{
                     robot.mecanumDrive(0.0,0.0,0.0);
                     assignRefererence();
-                    deltas = robot.mecanumDeltas(0.0, boxDist);
+                    deltas = robot.mecanumDeltas(0.0, boxDistY);
                     Log.i(logTag, "Return Completed, moving to cryptobox."
                             + "\nCurrent Heading is: "
                             + robot.heading()
@@ -225,17 +244,17 @@ public class AutoBase extends OpMode{
                             + "\nTarget is: "
                             + (refLF + -deltas[0])
                     );
-                    state = currentState.MOVETOBOX;
+                    state = currentState.MOVE_TO_BOX_Y;
                 }
                 break;
-            case MOVETOBOX:
-                Log.v(logTag, "Moving to box, current position is: "
+            case MOVE_TO_BOX_Y:
+                Log.v(logTag, "Moving to box in Y axis, current position is: "
                         + robot.leftFrontDrive.getCurrentPosition()
                         + "\nTarget is: "
                         + (refLF + -deltas[0])
                 );
 
-                double rot;
+
                 if (robot.heading() < -2.0){
                     rot = -0.2;
                 }
@@ -247,8 +266,58 @@ public class AutoBase extends OpMode{
                     rot = 0.0;
                 }
 
-                if (robot.leftFrontDrive.getCurrentPosition() <= refLF + -deltas[0]){
+                if (robot.leftFrontDrive.getCurrentPosition() <= refLF + -deltas[0] +20.0
+                        && robot.leftFrontDrive.getCurrentPosition() >= refLF - deltas[0] - 20.0){
                     robot.mecanumDrive(direction1, 0.3, rot);
+                }
+                else {
+                    robot.mecanumDrive(0.0, 0.0, 0.0);
+                    assignRefererence();
+                    switch (fieldLocation){
+                        case CLOSE:
+                            state = currentState.ALIGN;
+                            Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
+                                + (refLF + -deltas[0])
+                                + "\nEnding Value was: "
+                                + robot.leftFrontDrive.getCurrentPosition()
+                            );
+                            break;
+                        case FAR:
+                            state = currentState.MOVE_TO_BOX_X;
+                            Log.i(logTag, "Box Y Reached, X axis.\nTarget LF was:"
+                                    + (refLF + -deltas[0])
+                                    + "\nEnding Value was: "
+                                    + robot.leftFrontDrive.getCurrentPosition()
+                            );
+                            assignRefererence();
+
+                            deltas = robot.mecanumDeltas(boxDistX, 0.0);
+                            break;
+                        default:
+                            state = currentState.ALIGN;
+                            break;
+                    }
+                }
+                break;
+            case MOVE_TO_BOX_X:
+                Log.v(logTag, "Moving to box in x axis, current position is: "
+                        + robot.leftFrontDrive.getCurrentPosition()
+                        + "\nTarget is: "
+                        + (refLF + -deltas[0])
+                );
+                if (robot.heading() < -2.0){
+                    rot = -0.2;
+                }
+                else if (robot.heading() > 2.0){
+
+                    rot = 0.2;
+                }
+                else{
+                    rot = 0.0;
+                }
+                if (robot.leftFrontDrive.getCurrentPosition() <= refLF + -deltas[0] +20.0
+                        && robot.leftFrontDrive.getCurrentPosition() >= refLF - deltas[0] - 20.0){
+                    robot.mecanumDrive(direction2, 0.3, rot);
                 }
                 else {
                     robot.mecanumDrive(0.0, 0.0, 0.0);
@@ -258,7 +327,19 @@ public class AutoBase extends OpMode{
                             + "\nEnding Value was: "
                             + robot.leftFrontDrive.getCurrentPosition()
                     );
-                    state = currentState.ALIGN;
+                    switch (fieldLocation){
+                        case CLOSE:
+                            state = currentState.ALIGN;
+                            break;
+                        case FAR:
+                            state = currentState.MOVE_TO_BOX_X;
+                            assignRefererence();
+                            deltas = robot.mecanumDeltas(boxDistX, 0.0);
+                            break;
+                        default:
+                            state = currentState.ALIGN;
+                            break;
+                    }
                 }
                 break;
             case ALIGN:
@@ -301,7 +382,10 @@ public class AutoBase extends OpMode{
     } //loop
     @Override
     public void stop(){
-        Log.i(logTag, allianceColor.toString() + " " + fieldLocation.toString() + "Autonomous Completed. \nEnding state was: "
+        Log.i(logTag, allianceColor.toString()
+                + " "
+                + fieldLocation.toString()
+                + "Autonomous Completed. \nEnding state was: "
                 + state.toString()
                 + "\nGripper State was: "
                 + gripperState.toString()

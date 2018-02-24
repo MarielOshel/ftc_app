@@ -118,13 +118,13 @@ public class HardwareBotman
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);// Set to TWISTCW if using AndyMark motors
+            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);// Set to TWIST_CW if using AndyMark motors
             rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         }
         else{
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);// Set to TWISTCW if using AndyMark motors
+            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);// Set to TWIST_CW if using AndyMark motors
             rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         }
 
