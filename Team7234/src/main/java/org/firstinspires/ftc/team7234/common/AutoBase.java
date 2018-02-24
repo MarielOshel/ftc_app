@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.team7234.RelicVuMarkIdentification2;
 import org.firstinspires.ftc.team7234.common.enums.AllianceColor;
 import org.firstinspires.ftc.team7234.common.enums.FieldLocation;
 
@@ -302,7 +301,7 @@ public class AutoBase extends OpMode{
     } //loop
     @Override
     public void stop(){
-        Log.i(logTag, "Autonomous Completed. \nEnding state was: "
+        Log.i(logTag, allianceColor.toString() + " " + fieldLocation.toString() + "Autonomous Completed. \nEnding state was: "
                 + state.toString()
                 + "\nGripper State was: "
                 + gripperState.toString()

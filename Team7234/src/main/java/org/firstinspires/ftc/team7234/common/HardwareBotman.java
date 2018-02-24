@@ -113,7 +113,7 @@ public class HardwareBotman
         leftBackDrive = hwMap.get(DcMotor.class, "left Back Drive");
         rightBackDrive = hwMap.get(DcMotor.class, "right Back Drive");
         arm    = hwMap.get(DcMotor.class, "arm");
-        relicArm = hwMap.get(DcMotor.class, "relicArm"); //TODO: Check Hardware Map on robot
+        relicArm = hwMap.get(DcMotor.class, "relicArm");
 
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
