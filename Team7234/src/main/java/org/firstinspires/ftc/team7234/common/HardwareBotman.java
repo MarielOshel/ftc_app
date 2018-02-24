@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.team7234;
+package org.firstinspires.ftc.team7234.common;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -28,42 +28,42 @@ public class HardwareBotman
 {
     //region Public OpMode members
 
-    DcMotor leftFrontDrive   = null;
-    DcMotor rightFrontDrive = null;
-    DcMotor leftBackDrive = null;
-    DcMotor rightBackDrive = null;
-    DcMotor arm     = null;
-    DcMotor relicArm = null;
-    Servo   leftClaw    = null;
-    Servo   rightClaw   = null;
-    Servo   jewelPusher = null;
-    Servo   relicClaw = null;
+    public DcMotor leftFrontDrive   = null;
+    public DcMotor rightFrontDrive = null;
+    public DcMotor leftBackDrive = null;
+    public DcMotor rightBackDrive = null;
+    public DcMotor arm     = null;
+    public DcMotor relicArm = null;
+    public Servo   leftClaw    = null;
+    public Servo   rightClaw   = null;
+    public Servo   jewelPusher = null;
+    public Servo   relicClaw = null;
 
-    DigitalChannel armLimit = null;
+    public DigitalChannel armLimit = null;
 
-    ColorSensor jewelColorSensor = null;
+    public ColorSensor jewelColorSensor = null;
 
-    BNO055IMU imu;
-    Orientation angles;
+    public BNO055IMU imu;
+    public Orientation angles;
     //endregion
 
 
     //region Values
-    float hsvValues[] = {0F, 0F, 0F};
+    public float hsvValues[] = {0F, 0F, 0F};
 
     public static final double MID_SERVO       =  0.5 ;
 
-    static final double RIGHT_GRIPPER_OPEN    =  0 ;
-    static final double LEFT_GRIPPER_OPEN  = 1 ;
+    public static final double RIGHT_GRIPPER_OPEN    =  0 ;
+    public static final double LEFT_GRIPPER_OPEN  = 1 ;
 
-    private static final double RIGHT_GRIPPER_HALF = 0.7;
-    private static final double LEFT_GRIPPER_HALF = 0.3;
+    public static final double RIGHT_GRIPPER_HALF = 0.7;
+    public static final double LEFT_GRIPPER_HALF = 0.3;
 
-    static final double RIGHT_GRIPPER_CLOSED    =  1 ;
-    static final double LEFT_GRIPPER_CLOSED  = 0;
+    public static final double RIGHT_GRIPPER_CLOSED    =  1 ;
+    public static final double LEFT_GRIPPER_CLOSED  = 0;
 
-    static final double JEWEL_PUSHER_UP = 0.32;
-    static final double JEWEL_PUSHER_DOWN = 1;
+    public static final double JEWEL_PUSHER_UP = 0.32;
+    public static final double JEWEL_PUSHER_DOWN = 1;
 
     private static final double RELIC_ARM_BOTTOM = 0.0;
     private static final double RELIC_ARM_TOP = 1.0;
@@ -71,8 +71,8 @@ public class HardwareBotman
     //endregion
 
     //Establishes variables for motors
-    double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
-    DcMotor[] driveMotors;
+    public double[] mecanumSpeeds = {0.0, 0.0, 0.0, 0.0};
+    public DcMotor[] driveMotors;
 
     public enum GripperState{
         OPEN,
@@ -95,15 +95,15 @@ public class HardwareBotman
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
-    HardwareBotman(){}
+    public HardwareBotman(){}
 
     //alternative init to accomodate older code without Zero Power Behavior
-    void init(HardwareMap ahwMap, boolean reverseRight, DcMotor.ZeroPowerBehavior behavior){
+    public void init(HardwareMap ahwMap, boolean reverseRight, DcMotor.ZeroPowerBehavior behavior){
         init(ahwMap, reverseRight);
         setMotorFloatMode(behavior);
     }
     /* Initialize standard Hardware interfaces */
-    void init(HardwareMap ahwMap, boolean reverseRight) {
+    public void init(HardwareMap ahwMap, boolean reverseRight) {
         // Save reference to Hardware map
         hwMap = ahwMap;
 
@@ -170,13 +170,13 @@ public class HardwareBotman
         imu.initialize(parameters);
     }
 
-    void setMotorFloatMode(DcMotor.ZeroPowerBehavior behavior){
+    public void setMotorFloatMode(DcMotor.ZeroPowerBehavior behavior){
         for (int i=0; i < 4; i++){
             driveMotors[i].setZeroPowerBehavior(behavior);
         }
     }
 
-    double heading(){
+    public double heading(){
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
@@ -184,7 +184,7 @@ public class HardwareBotman
 
     //region Gripper Control
 
-    void gripperSet(GripperState state){
+    public void gripperSet(GripperState state){
         switch (state){
             case OPEN:
                 leftClaw.setPosition(LEFT_GRIPPER_OPEN);
@@ -204,7 +204,7 @@ public class HardwareBotman
     //endregion
 
     //region Robot Driving
-    void arrayDrive(double lf, double rf, double lb, double rb){
+    public void arrayDrive(double lf, double rf, double lb, double rb){
         leftFrontDrive.setPower(lf);
         rightFrontDrive.setPower(rf);
         leftBackDrive.setPower(lb);
@@ -212,7 +212,7 @@ public class HardwareBotman
     }
 
 
-    void mecanumDrive(double angle, double magnitude, double rotation){  //Calculates and sends values to wheels
+    public void mecanumDrive(double angle, double magnitude, double rotation){  //Calculates and sends values to wheels
         //region Exceptions
         /*if(angle> 1.5 *Math.PI || angle< -0.5*Math.PI){
             throw new IllegalArgumentException("Angle is outside range [-pi/2, 3pi/2]. Invalid Value is: " + Double.toString(angle));
@@ -253,7 +253,7 @@ public class HardwareBotman
         //endregion
     }
 
-    double[] mecanumDeltas(double x, double y){
+    public double[] mecanumDeltas(double x, double y){
         return new double[]{
                 ticsPerInch(x)*Math.sqrt(2.0)+ticsPerInch(y)*Math.sqrt(2.0), //Left Front
                 ticsPerInch(x)*Math.sqrt(2.0)-ticsPerInch(y)*Math.sqrt(2.0), //Right Front
@@ -275,7 +275,7 @@ public class HardwareBotman
         return output;
     }
 
-    void driveByGyro(double speed, double header){
+    public void driveByGyro(double speed, double header){
         if(speed > 0.9 || speed < -0.9) {
             throw new IllegalArgumentException("Nah fam, keep it between -0.9 and 0.9" + speed);
         }
@@ -295,7 +295,7 @@ public class HardwareBotman
         return (560.0*distance/(4.0*Math.PI));
     }
 
-    void resetEncoders() {
+    public void resetEncoders() {
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

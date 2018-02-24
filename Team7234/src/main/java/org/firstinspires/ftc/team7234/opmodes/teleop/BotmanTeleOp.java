@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.team7234;
+package org.firstinspires.ftc.team7234.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.team7234.common.HardwareBotman;
 
 @TeleOp(name="BotmanTeleOp", group="Pushbot")
 //@Disabled

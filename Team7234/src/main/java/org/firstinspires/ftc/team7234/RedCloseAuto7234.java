@@ -8,8 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-
-import java.util.logging.Logger;
+import org.firstinspires.ftc.team7234.common.HardwareBotman;
 
 
 @Autonomous(name = "NEW Red Close", group = "DB")
