@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.team7234.common.HardwareBotman;
 
 @TeleOp(name="BotmanTeleOp", group="Pushbot")
-//@Disabled
 public class BotmanTeleOp extends OpMode{
 
     /* Declare OpMode members. */
