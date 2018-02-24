@@ -15,15 +15,15 @@ import org.firstinspires.ftc.team7234.common.enums.FieldLocation;
  */
 public class AutoBase extends OpMode{
 
-    final AllianceColor allianceColor; //Color of the Alliance
-    final FieldLocation fieldLocation; //Location on the field, relative to the recovery zone
-    final String logTag; //Name of program extending this class, for logging purposes
+    private final AllianceColor allianceColor; //Color of the Alliance
+    private final FieldLocation fieldLocation; //Location on the field, relative to the recovery zone
+    private final String logTag; //Name of program extending this class, for logging purposes
 
-    final double boxDistY; //Distance Travelled, in inches, to reach the cryptobox in the front-back direction
-    final double boxDistX; //Distance Travelled, in inches, to reach the cryptobox in the left-right direction
-    final double theta1; //Angle of rotation with which to align the robot with the cryptobox
-    final double direction1; //Direction in which to travel when aligning with the cryptobox in the Y axis
-    final double direction2; //Direction in which to travel when aligning with the cryptobox in the X axis
+    private final double boxDistY; //Distance Travelled, in inches, to reach the cryptobox in the front-back direction
+    private final double boxDistX; //Distance Travelled, in inches, to reach the cryptobox in the left-right direction
+    private final double theta1; //Angle of rotation with which to align the robot with the cryptobox
+    private final double direction1; //Direction in which to travel when aligning with the cryptobox in the Y axis
+    private final double direction2; //Direction in which to travel when aligning with the cryptobox in the X axis
 
 
     public AutoBase(AllianceColor allianceColor, FieldLocation fieldLocation, String logTag){
@@ -68,9 +68,9 @@ public class AutoBase extends OpMode{
         }
     }
 
-    RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
+    private RelicVuMarkIdentification2 relicVuMark = new RelicVuMarkIdentification2();
     public RelicRecoveryVuMark keyFinder;
-    HardwareBotman robot = new HardwareBotman();
+    private HardwareBotman robot = new HardwareBotman();
 
     public enum currentState {
         PREP,
@@ -101,13 +101,10 @@ public class AutoBase extends OpMode{
     private double refLB;
     private double refRB;
 
-    private double rot;
-
     private double[] deltas;
     private double htarget = 0.0;
 
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
-    private String jewelString;
 
     @Override
     public void init() {
@@ -168,6 +165,7 @@ public class AutoBase extends OpMode{
 
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
+                String jewelString;
                 if((robot.hsvValues[0] > 175 && robot.hsvValues[0] < 215) && (robot.hsvValues[1] > .5)){
                     switch (allianceColor){
                         case RED:
@@ -255,6 +253,7 @@ public class AutoBase extends OpMode{
                 );
 
 
+                double rot;
                 if (robot.heading() < -2.0){
                     rot = -0.2;
                 }

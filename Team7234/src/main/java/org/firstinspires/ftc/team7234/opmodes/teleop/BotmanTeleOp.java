@@ -35,9 +35,9 @@ public class BotmanTeleOp extends OpMode{
     private boolean orientationToggle;
     private boolean rotationToggle;
 
-    double magnitude;
-    double rotation;
-    double angle;
+    private double magnitude;
+    private double rotation;
+    private double angle;
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
 
