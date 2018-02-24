@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.team7234.common.HardwareBotman;
 import org.firstinspires.ftc.team7234.common.RelicVuMarkIdentification2;
 
-
+@Disabled
 @Autonomous(name = "NEW Red Close", group = "DB")
 public class RedCloseAuto7234 extends OpMode{
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.team7234.opmodes.teleop;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +15,8 @@ public class BotmanTeleOp extends OpMode{
     /* Declare OpMode members. */
     private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
+
+    private final String logTag = HardwareBotman.class.getName();
 
     private static final double driveCurve = 1.0;
     private static final double extensionPow = 0.5;
@@ -69,8 +73,7 @@ public class BotmanTeleOp extends OpMode{
 
         //endregion
         relicPos = robot.relicClaw.getPosition();
-
-
+        Log.i(logTag, "Robot Initialized");
     }
     @Override
     public void init_loop(){}
@@ -98,6 +101,11 @@ public class BotmanTeleOp extends OpMode{
             case LEFT:
                 if (robot.heading() > targetHead - 3.0 && robot.heading() < targetHead + 3.0){
                     turnState = turningState.NORMAL;
+                    Log.i(logTag, "Left Turn completed, Target heading was: "
+                            + targetHead
+                            + "\nRobot Heading is now: "
+                            + robot.heading()
+                    );
                     break;
                 }
                 else{
@@ -107,6 +115,11 @@ public class BotmanTeleOp extends OpMode{
             case RIGHT:
                 if (robot.heading() >targetHead - 3.0 && robot.heading() < targetHead + 3.0){
                     turnState = turningState.NORMAL;
+                    Log.i(logTag, "Right Turn completed, Target heading was: "
+                            + targetHead
+                            + "\nRobot Heading is now: "
+                            + robot.heading()
+                    );
                     break;
                 }
                 else{
@@ -140,7 +153,7 @@ public class BotmanTeleOp extends OpMode{
         }
         //endregion
         //region 5 Claw
-        relicIncrementing = gamepad2.right_stick_y / 500.0;
+        relicIncrementing = gamepad2.right_stick_y / 20.0;
 
         if (relicPos + relicIncrementing > 1.0){
             relicPos = 1.0;

@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * This is NOT an OpMode
  *
  * This class contains methods for initialization and control of the robot
- *
+ *@author Donald Brown
  */
 public class HardwareBotman
 {
@@ -115,6 +115,8 @@ public class HardwareBotman
         arm    = hwMap.get(DcMotor.class, "arm");
         relicArm = hwMap.get(DcMotor.class, "relicArm");
 
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
             leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -149,9 +151,6 @@ public class HardwareBotman
         rightClaw.setPosition(RIGHT_GRIPPER_OPEN);
         jewelPusher.setPosition(JEWEL_PUSHER_UP);
         relicClaw.scaleRange(RELIC_ARM_BOTTOM, RELIC_ARM_TOP);
-        relicClaw.setPosition(1.0);
-
-
 
         //Define sensors
         jewelColorSensor = hwMap.get(ColorSensor.class, "jewelColorSensor");
@@ -291,7 +290,7 @@ public class HardwareBotman
 
     }
 
-    double ticsPerInch(double distance){
+    public double ticsPerInch(double distance){
         return (560.0*distance/(4.0*Math.PI));
     }
 

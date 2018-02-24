@@ -9,6 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.team7234.common.enums.AllianceColor;
 import org.firstinspires.ftc.team7234.common.enums.FieldLocation;
+
+import java.util.Arrays;
+
 /**
  * This class is meant to provide a framework on which to build our autonomous for Relic Recovery
  * @author Donald Brown
@@ -111,9 +114,11 @@ public class AutoBase extends OpMode{
         robot.init(hardwareMap, false, DcMotor.ZeroPowerBehavior.BRAKE);
         relicVuMark.init(hardwareMap);
         telemetry.addData("Status", "Initialized");
+
         alignStart = true;
         assignRefererence();
         deltas = robot.mecanumDeltas(0,0);
+        Log.i(logTag, "Initalization complete");
     }
 
     @Override
@@ -147,7 +152,7 @@ public class AutoBase extends OpMode{
                 }
                 else {
                     robot.arm.setPower(0.0);
-                    robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_UP);
+                    robot.jewelPusher.setPosition(HardwareBotman.JEWEL_PUSHER_DOWN);
                     state = currentState.JEWEL;
                     Log.i(logTag, "Preparation Completed, Gripper State is: " + gripperState.toString());
                 }
@@ -162,6 +167,8 @@ public class AutoBase extends OpMode{
                         robot.jewelColorSensor.blue()*8,
                         robot.hsvValues
                 );
+
+                Log.v(logTag, "Searching for Jewel, currently seeing [" + Arrays.toString(robot.hsvValues) + "]");
 
                 //This is for the color blue and double checking through the amount of blue so that it doesn't
                 //mistake a blue-ish lit room
@@ -198,6 +205,7 @@ public class AutoBase extends OpMode{
                 }
                 break;
             case TWIST_CW:
+                Log.v(logTag, "Now turning, target is -10, current heading is: " + robot.heading());
                 if (robot.heading() >= -10){
                     robot.mecanumDrive(0.0, 0.0, 0.3);
                 }
@@ -211,6 +219,7 @@ public class AutoBase extends OpMode{
                 }
                 break;
             case TWIST_CCW:
+                Log.v(logTag, "Now turning, target is 10, current heading is: " + robot.heading());
                 if (robot.heading() <= 10){
                     robot.mecanumDrive(0.0, 0.0, -0.3);
                 }
@@ -252,7 +261,6 @@ public class AutoBase extends OpMode{
                         + (refLF + -deltas[0])
                 );
 
-
                 double rot;
                 if (robot.heading() < -2.0){
                     rot = -0.2;
@@ -265,38 +273,73 @@ public class AutoBase extends OpMode{
                     rot = 0.0;
                 }
 
-                if (robot.leftFrontDrive.getCurrentPosition() <= refLF + -deltas[0] +20.0
-                        && robot.leftFrontDrive.getCurrentPosition() >= refLF - deltas[0] - 20.0){
-                    robot.mecanumDrive(direction1, 0.3, rot);
-                }
-                else {
-                    robot.mecanumDrive(0.0, 0.0, 0.0);
-                    assignRefererence();
-                    switch (fieldLocation){
-                        case CLOSE:
-                            state = currentState.ALIGN;
-                            Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
-                                + (refLF + -deltas[0])
-                                + "\nEnding Value was: "
-                                + robot.leftFrontDrive.getCurrentPosition()
-                            );
-                            break;
-                        case FAR:
-                            state = currentState.MOVE_TO_BOX_X;
-                            Log.i(logTag, "Box Y Reached, X axis.\nTarget LF was:"
-                                    + (refLF + -deltas[0])
-                                    + "\nEnding Value was: "
-                                    + robot.leftFrontDrive.getCurrentPosition()
-                            );
-                            assignRefererence();
+                if (deltas[0] < 0.0){
+                    if (robot.leftFrontDrive.getCurrentPosition() <= refLF -deltas[0]){
+                        robot.mecanumDrive(direction1, 0.3, rot);
+                    }
+                    else {
+                        robot.mecanumDrive(0.0, 0.0, 0.0);
+                        assignRefererence();
+                        switch (fieldLocation){
+                            case CLOSE:
+                                state = currentState.ALIGN;
+                                Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
+                                        + (refLF + -deltas[0])
+                                        + "\nEnding Value was: "
+                                        + robot.leftFrontDrive.getCurrentPosition()
+                                );
+                                break;
+                            case FAR:
+                                state = currentState.MOVE_TO_BOX_X;
+                                Log.i(logTag, "Box Y Reached, X axis.\nTarget LF was:"
+                                        + (refLF + -deltas[0])
+                                        + "\nEnding Value was: "
+                                        + robot.leftFrontDrive.getCurrentPosition()
+                                );
+                                assignRefererence();
 
-                            deltas = robot.mecanumDeltas(boxDistX, 0.0);
-                            break;
-                        default:
-                            state = currentState.ALIGN;
-                            break;
+                                deltas = robot.mecanumDeltas(boxDistX, 0.0);
+                                break;
+                            default:
+                                state = currentState.ALIGN;
+                                break;
+                        }
                     }
                 }
+                else {
+                    if (robot.leftFrontDrive.getCurrentPosition() >= refLF -deltas[0]){
+                        robot.mecanumDrive(direction1, 0.3, rot);
+                    }
+                    else {
+                        robot.mecanumDrive(0.0, 0.0, 0.0);
+                        assignRefererence();
+                        switch (fieldLocation) {
+                            case CLOSE:
+                                state = currentState.ALIGN;
+                                Log.i(logTag, "Box Reached, beginning spin.\nTarget LF was:"
+                                        + (refLF + -deltas[0])
+                                        + "\nEnding Value was: "
+                                        + robot.leftFrontDrive.getCurrentPosition()
+                                );
+                                break;
+                            case FAR:
+                                state = currentState.MOVE_TO_BOX_X;
+                                Log.i(logTag, "Box Y Reached, X axis.\nTarget LF was:"
+                                        + (refLF + -deltas[0])
+                                        + "\nEnding Value was: "
+                                        + robot.leftFrontDrive.getCurrentPosition()
+                                );
+                                assignRefererence();
+
+                                deltas = robot.mecanumDeltas(boxDistX, 0.0);
+                                break;
+                            default:
+                                state = currentState.ALIGN;
+                                break;
+                        }
+                    }
+                }
+
                 break;
             case MOVE_TO_BOX_X:
                 Log.v(logTag, "Moving to box in x axis, current position is: "
@@ -369,7 +412,7 @@ public class AutoBase extends OpMode{
                 deltas = robot.mecanumDeltas(0.0, -3.0);
                 break;
             case RETREAT:
-                if(robot.leftBackDrive.getCurrentPosition() >= refLB -deltas[0]){
+                if(robot.leftFrontDrive.getCurrentPosition() >= refLF -deltas[0]){
                     robot.mecanumDrive(Math.PI, 0.5, 0.0);
                 }
                 else{

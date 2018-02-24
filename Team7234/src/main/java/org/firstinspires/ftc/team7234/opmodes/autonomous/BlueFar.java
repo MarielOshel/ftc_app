@@ -6,7 +6,7 @@ import org.firstinspires.ftc.team7234.common.AutoBase;
 import org.firstinspires.ftc.team7234.common.enums.AllianceColor;
 import org.firstinspires.ftc.team7234.common.enums.FieldLocation;
 
-@Autonomous(name = "NEWER Blue Faar Auto", group = "Inheritance Experiment")
+@Autonomous(name = "NEWER Blue Far Auto", group = "Inheritance Experiment")
 public class BlueFar extends AutoBase {
     public BlueFar(){
         super(AllianceColor.BLUE, FieldLocation.FAR, "BlueFar");
