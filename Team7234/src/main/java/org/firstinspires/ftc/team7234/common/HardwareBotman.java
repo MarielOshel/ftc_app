@@ -115,7 +115,6 @@ public class HardwareBotman
         arm    = hwMap.get(DcMotor.class, "arm");
         relicArm = hwMap.get(DcMotor.class, "relicArm");
 
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (reverseRight){
             leftFrontDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors

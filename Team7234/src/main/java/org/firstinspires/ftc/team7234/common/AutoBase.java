@@ -146,7 +146,7 @@ public class AutoBase extends OpMode{
         switch (state){
             case PREP:
                 if (!robot.armLimit.getState()){
-                    gripperState = HardwareBotman.GripperState.OPEN; //Opposite of intent due to recent hardware changes TODO: Fix this for all programs in next release
+                    gripperState = HardwareBotman.GripperState.CLOSED;
                     robot.gripperSet(gripperState);
                     robot.arm.setPower(0.2);
                 }
@@ -405,12 +405,14 @@ public class AutoBase extends OpMode{
                     }
                 }
                 break;
+
             case RELEASE:
                 gripperState = HardwareBotman.GripperState.HALFWAY;
                 assignRefererence();
                 robot.gripperSet(gripperState);
                 deltas = robot.mecanumDeltas(0.0, -3.0);
                 break;
+
             case RETREAT:
                 if(robot.leftFrontDrive.getCurrentPosition() >= refLF -deltas[0]){
                     robot.mecanumDrive(Math.PI, 0.5, 0.0);

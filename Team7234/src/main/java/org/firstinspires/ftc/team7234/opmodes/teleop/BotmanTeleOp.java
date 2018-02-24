@@ -152,8 +152,8 @@ public class BotmanTeleOp extends OpMode{
             armPower = gamepad2.left_trigger - gamepad2.right_trigger;
         }
         //endregion
-        //region 5 Claw
-        relicIncrementing = gamepad2.right_stick_y / 20.0;
+        //region Claw
+        relicIncrementing = gamepad2.right_stick_y / 250.0;
 
         if (relicPos + relicIncrementing > 1.0){
             relicPos = 1.0;
@@ -287,6 +287,9 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("Angle: ", angle);
         telemetry.addData("Magnitude: ", magnitude);
         telemetry.addData("Rotation: ", rotation);
+        telemetry.addLine();
+        telemetry.addData("Arm: ", armPower);
+        telemetry.addData("Arm-pow: ", robot.arm.getPower());
         telemetry.addLine();
         telemetry.addData("Relic Power: ", relicPower);
         telemetry.addData("Relic Position: ", relicPos);
