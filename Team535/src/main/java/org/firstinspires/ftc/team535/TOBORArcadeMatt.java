@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.team535;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
@@ -42,8 +43,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.lang.Math.*;
 
-@TeleOp(name = "TOBOR Arcade Matt", group = "Teleop")
-//@Disabled
+@TeleOp(name = "TOBOR Arcade Matt Onbot", group = "Teleop")
+@Disabled
 
 public class TOBORArcadeMatt extends OpMode {
 
@@ -68,6 +69,8 @@ public class TOBORArcadeMatt extends OpMode {
         robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
         robo.arm(HardwareTOBOR.armPos.Up);
+        Orientation angles;
+        angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
     @Override
@@ -132,7 +135,7 @@ public class TOBORArcadeMatt extends OpMode {
         {
             toggleRunmode = true;
         }
-
+        
 
         if (fastRunmode)
         {
@@ -148,18 +151,15 @@ public class TOBORArcadeMatt extends OpMode {
         robo.rightTrackUp.setPower(.83533 * (-Range.clip(gamepad2.right_stick_y,-1,1)));
         robo.leftTrackUp.setPower(-Range.clip(gamepad2.right_stick_y, -1,1));
 
-        
-        
-        if (gamepad2.right_bumper)
-        {
-            robo.RPlate.setPosition(.08);
-            robo.LPlate.setPosition(1);
-        }
-        else
-        {
-            robo.RPlate.setPosition(.81);
-            robo.LPlate.setPosition(.27);
-        }
+
+
+            if (gamepad2.right_bumper) {
+                robo.RPlate.setPosition(robo.RPlateupval);
+                robo.LPlate.setPosition(robo.LPlateupval);
+            } else {
+                robo.RPlate.setPosition(robo.RPlatedownval);
+                robo.LPlate.setPosition(robo.LPlatedownval);
+            }
 
 
         if (gamepad2.dpad_up)
@@ -175,7 +175,7 @@ public class TOBORArcadeMatt extends OpMode {
             robo.arm(HardwareTOBOR.armPos.Back);
         }
 
-        if (gamepad1.right_bumper)
+        /*if (gamepad1.right_bumper)
         {
             robo.relicArmTurn.setPower(1);
         }
@@ -186,7 +186,7 @@ public class TOBORArcadeMatt extends OpMode {
         else
         {
             robo.relicArmTurn.setPower(0);
-        }
+        }*/
     }
 
 

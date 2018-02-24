@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "TOBOR Tank Drive", group = "Teleop")
-//@Disabled
+@Disabled
 
 public class TOBORTank extends OpMode {
 
@@ -138,7 +138,7 @@ public class TOBORTank extends OpMode {
         {
             robo.arm(HardwareTOBOR.armPos.Back);
         }
-        if (gamepad2.right_trigger >= 0.1)
+        /*if (gamepad2.right_trigger >= 0.1)
         {
             robo.relicArmTurn.setPower(1);
         }
@@ -149,7 +149,7 @@ public class TOBORTank extends OpMode {
         else
         {
             robo.relicArmTurn.setPower(0);
-        }
+        }*/
         telemetry.addData("RPlate", robo.RPlate.getPosition());
         telemetry.addData("LPlate", robo.LPlate.getPosition());
         telemetry.addData("JoystickL", gamepad2.left_stick_y);
