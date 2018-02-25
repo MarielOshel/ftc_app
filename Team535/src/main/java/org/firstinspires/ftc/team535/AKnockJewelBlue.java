@@ -30,42 +30,44 @@
 package org.firstinspires.ftc.team535;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 
-@Autonomous(name="TOBORBlueSideAutonomousGreenwood", group="Autonomous")
+@Autonomous(name="Knock Blue Jewel", group="Autonomous")
 //@Disabled
-public class ToborBlueSideAutonomousGreenwood extends OpMode
+public class AKnockJewelBlue extends OpMode
 {
     HardwareTOBOR robo = new HardwareTOBOR();
     double heading;
+    HardwareTOBOR.direction dir = HardwareTOBOR.direction.Unknown;
     public enum state{
-        DRIVEOFFSTONE,
-        SEEKCOLUMN,
-        LEFT,
-        CENTER,
-        MOVEFORWARD,
-        PLACEBLOCK,
-        BACKUP,
+        READJEWEL,
+        HITJEWELOUT,
+        HITJEWELIN,
+        ARMUP,
         STOPALL
-
     }
 
     double TPI = 43;
-    state currentState = state.DRIVEOFFSTONE;
+    state currentState = state.READJEWEL;
     private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
-    
+
     @Override
     public void init()
     {
+
         telemetry.addData("Status", "Initialized");
         robo.initRobo(hardwareMap);
-        robo.initVuforia();
-        robo.startVuforia();
+        robo.arm(HardwareTOBOR.armPos.Up);
+        robo.wrist(HardwareTOBOR.wristPos.Closed);
+
         
     }
 
@@ -73,11 +75,6 @@ public class ToborBlueSideAutonomousGreenwood extends OpMode
     @Override
     public void init_loop()
     {
-        if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN)
-        {
-            vuMark = robo.readKey();
-            telemetry.addData("Vumark Acquired", vuMark);
-        }
         robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -89,7 +86,7 @@ public class ToborBlueSideAutonomousGreenwood extends OpMode
     @Override
     public void start()
     {
-        robo.stopVuforia();
+        robo.runtime.reset();
         robo.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robo.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robo.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -102,61 +99,42 @@ public class ToborBlueSideAutonomousGreenwood extends OpMode
     {
         telemetry.addData("BRMotor", robo.BRMotor.getCurrentPosition());
         switch (currentState){
-            case DRIVEOFFSTONE:
-                heading = robo.strafeLeftAuto(0.35);
-                if (((25*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
-                {
-                    currentState = state.SEEKCOLUMN;
-                }
-            break;
-            case SEEKCOLUMN:
-                if (vuMark == RelicRecoveryVuMark.RIGHT || vuMark == RelicRecoveryVuMark.UNKNOWN)
-                {
-                    currentState = state.MOVEFORWARD;
-                }
-                
-                else if (vuMark == RelicRecoveryVuMark.CENTER)
-                {
-                    currentState = state.CENTER;
-                }
-                else if (vuMark == RelicRecoveryVuMark.LEFT)
-                {
-                    currentState = state.LEFT;
+            case READJEWEL:
+                robo.arm(HardwareTOBOR.armPos.Down);
+                if (robo.runtime.seconds() >= 1) {
+
+                    dir = robo.knockJewel(HardwareTOBOR.color.Blue);
+                    telemetry.addData("Direction", robo.knockJewel(HardwareTOBOR.color.Blue));
+                    if (dir != HardwareTOBOR.direction.Unknown) {
+                        currentState = state.HITJEWELOUT;
+                    } else if (robo.runtime.seconds() >= 28) {
+
+                        currentState = state.STOPALL;
+                    }
                 }
                 break;
-            case CENTER:
-               heading = robo.strafeLeftAuto(0.35);
-               telemetry.addData("Distance", Math.abs((36*TPI)+robo.BRMotor.getCurrentPosition()));
-                if (((36*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI))&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
+            case HITJEWELOUT:
+                robo.angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                if (dir == HardwareTOBOR.direction.Left)
                 {
-                    currentState = state.MOVEFORWARD;
+                    robo.wrist(HardwareTOBOR.wristPos.Closed);
+                    currentState = state.ARMUP;
+                }
+                else if (dir == HardwareTOBOR.direction.Right)
+                {
+                    robo.wrist(HardwareTOBOR.wristPos.Right);
+                    currentState = state.ARMUP;
                 }
                 break;
-            case LEFT:
-                heading = robo.strafeLeftAuto(0.35);
-                if ((46*TPI)+robo.BRMotor.getCurrentPosition()< (0.5*TPI)&&(robo.rangeSensor.getDistance(DistanceUnit.INCH) >= 10))
-                {
-                    currentState = state.MOVEFORWARD;
-                }
-                break;
-            case MOVEFORWARD:
-                robo.DriveForwardAuto(-0.2);
-                if (robo.rangeSensor.getDistance(DistanceUnit.INCH)<= 10.25)
-                {
-                    currentState = state.PLACEBLOCK;
-                }
-                
-                break;
-            case PLACEBLOCK:
-                robo.RPlate.setPosition(.08);
-                robo.LPlate.setPosition(1);
-                robo.BRMotor.setPower(0);
-                robo.FRMotor.setPower(0);
-                robo.BLMotor.setPower(0);
-                robo.FLMotor.setPower(0);
+            case ARMUP:
+                robo.arm(HardwareTOBOR.armPos.Up);
+
+                currentState = state.STOPALL;
                 break;
             case STOPALL:
-            
+                robo.plate(HardwareTOBOR.platePos.Down);
+                robo.arm(HardwareTOBOR.armPos.Up);
+                robo.wrist(HardwareTOBOR.wristPos.Closed);
                 robo.BRMotor.setPower(0);
                 robo.FRMotor.setPower(0);
                 robo.BLMotor.setPower(0);
@@ -164,40 +142,6 @@ public class ToborBlueSideAutonomousGreenwood extends OpMode
             
             break;
         }
-        telemetry.addData("State", currentState);
-        telemetry.addData("1", "heading: " + heading);
-        
-
-
-
-        /*if (currentState == state.DRIVEOFFSTONE)
-        {
-            robo.BRMotor.setTargetPosition(-24*TPI);
-            robo.BLMotor.setTargetPosition(24*TPI);
-            robo.FRMotor.setTargetPosition(24*TPI);
-            robo.FLMotor.setTargetPosition(-24*TPI);
-            robo.strafeLeft(1);
-        }
-        else if (currentState == state.SEEKCOLUMN)
-        {
-            if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Left)
-            {
-
-            }
-            else if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Right)
-            {
-
-            }
-            else if (CryptoColumn == TOBORVuMarkIdentification.Crypto.Center)
-            {
-
-            }
-            else
-            {
-
-            }
-        }*/
-
     }
 
     @Override

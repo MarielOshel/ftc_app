@@ -33,64 +33,95 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.vuforia.VuMarkTarget;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-/**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
 
-@Autonomous(name="TOBORBleuSideRSAutonomous", group="Autonomous")
+@Autonomous(name="back and forth Onbot", group="Autonomous")
 @Disabled
-public class ToborBleuSideRSAutonomous extends OpMode
+public class moveforwardandback extends OpMode
 {
-    public RelicRecoveryVuMark roboLocation;
+    HardwareTOBOR robo = new HardwareTOBOR();
+    double heading;
+    HardwareTOBOR.direction dir;
+    public enum state{
+        READJEWEL,
+        HITJEWELOUT,
+        HITJEWELIN,
+        ARMUP,
+        DRIVEOFFSTONE,
+        SEEKCOLUMN,
+        LEFT,
+        CENTER,
+        MOVEFORWARD,
+        PLACEBLOCK,
+        BACKUP,
+        STOPALL
+    }
+
+    double TPI = 43;
+    state currentState = state.READJEWEL;
+    private RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
+
+    @Override
+    public void init()
+    {
+        telemetry.addData("Status", "Initialized");
+        robo.initRobo(hardwareMap);
+        robo.initVuforia();
+        robo.startVuforia();
+
+        
+    }
+
+
+    @Override
+    public void init_loop()
+    {
+        if (robo.readKey() != RelicRecoveryVuMark.UNKNOWN)
+        {
+            vuMark = robo.readKey();
+            telemetry.addData("Vumark Acquired", vuMark);
+        }
+        robo.BRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+
+
+    @Override
+    public void start()
+    {
+        robo.runtime.reset();
+        robo.stopVuforia();
+        robo.BRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.BLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.FRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robo.FLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        
+    }
+
+    @Override
+    public void loop()
+    {
+        heading =  robo.DriveForwardAuto(0.2,0);
+        telemetry.addData("BRMotor", robo.BRMotor.getCurrentPosition());
+
     
 
-    HardwareTOBOR robo = new HardwareTOBOR();
-public enum Auto{readImage, left, backCenterDrive, collect, forward, locate, spitout, end }
-
-    @Override
-    public void init() {
-        telemetry.addData("Status", "Initialized");
-    robo.initRobo(hardwareMap);
-        robo.initVuforia();
-
-    }
-
-
-    @Override
-    public void init_loop() {
-
-    }
-
-
-
-    @Override
-    public void start(){
-
+        telemetry.addData("1", "heading: " + heading);
     }
 
     @Override
-    public void loop() {
-    }
+    public void stop()
+    {
 
-    @Override
-    public void stop() {
     }
 
 }

@@ -34,14 +34,19 @@ package org.firstinspires.ftc.team535;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "TOBOR Tank Drive", group = "Teleop")
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+import java.lang.Math.*;
+
+@TeleOp(name = "TOBOR Arcade Matt Onbot", group = "Teleop")
 @Disabled
 
-public class TOBORTank extends OpMode {
+public class TOBORArcadeMatt extends OpMode {
 
     HardwareTOBOR robo = new HardwareTOBOR();
     double speedControl;
@@ -54,15 +59,18 @@ public class TOBORTank extends OpMode {
     boolean runningRT = false;
     boolean toggleLT = false;
     boolean runningLT = false;
-//poop
+
     boolean toggleRunmode = false;
     boolean fastRunmode = true;
+    Orientation angles;
     @Override
     public void init() {
 
         robo.initRobo(hardwareMap);
         telemetry.addData("Status:", "Robot is Initialized");
         robo.arm(HardwareTOBOR.armPos.Up);
+        Orientation angles;
+        angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
     @Override
@@ -71,17 +79,48 @@ public class TOBORTank extends OpMode {
 
     @Override
     public void loop() {
+        telemetry.addData("Movement", "G1: Right Stick(Arcade)");
+        telemetry.addData("Runmode", "G1: Right Stick Button (Fast/Slow)");
+        telemetry.addData("Lower Track", "G2: Left Stick Y");
+        telemetry.addData("Upper Track", "G2: Right Stick Y");
+        telemetry.addData("Flippy Dipper", "G2: Hold Right Bumper");
+        telemetry.addData("Jewel Arm Down", "G2: Dpad Down");
+        telemetry.addData("Jewel Arm Up", "G2: Dpad Up");
+        telemetry.addData("Jewel Arm Back", "G2: Dpad Right or Left");
 
-        if (gamepad1.right_trigger >= 0.1) {
-            robo.strafeRight(gamepad1.right_trigger*speedControl);
-        } else if (gamepad1.left_trigger >= 0.1) {
-            robo.strafeLeft(gamepad1.left_trigger*speedControl);
-        } else {
-            robo.FRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
-            robo.BRMotor.setPower(Range.clip(-gamepad1.left_stick_y*speedControl, -1, 1));
-            robo.FLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
-            robo.BLMotor.setPower(Range.clip(-gamepad1.right_stick_y*speedControl, -1, 1));
+        double leftx = Range.clip(-gamepad1.left_stick_y,-1,1);
+        double rightx = -Range.clip(gamepad1.right_stick_y,-1,1);
+        double righty = Range.clip(gamepad1.right_stick_x,-1,1);
+        angles = robo.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double angle = (Math.atan2(righty, rightx));
+        telemetry.addData("ATAN2", Math.atan2(righty, rightx));
+        double otherAngle = 0;
+        double hypotenuse = (Math.sqrt((rightx*rightx) + (righty * righty)))*speedControl;
+        if (angle < 0)
+        {
+            angle = ((2 * Math.PI) + angle);
         }
+
+
+        if (-angles.firstAngle <0)
+        {
+            otherAngle = ((360 + -angles.firstAngle)/180)*Math.PI;
+            angle = angle-(otherAngle);
+        }
+        else
+        {
+            otherAngle = (-angles.firstAngle/180)*Math.PI;
+            angle = angle-(otherAngle);
+        }
+
+
+        telemetry.addData("angle", angle);
+        telemetry.addData("other angle", otherAngle);
+
+        robo.BLMotor.setPower((hypotenuse*Math.cos(angle+(Math.PI/4)))-(leftx*speedControl));
+        robo.FRMotor.setPower((hypotenuse*Math.cos(angle+(Math.PI/4)))+(leftx*speedControl));
+        robo.BRMotor.setPower((hypotenuse*Math.sin(angle+(Math.PI/4)))+(leftx*speedControl));
+        robo.FLMotor.setPower((hypotenuse*Math.sin(angle+(Math.PI/4)))-(leftx*speedControl));
 
 
         if (toggleRunmode)
@@ -96,7 +135,7 @@ public class TOBORTank extends OpMode {
         {
             toggleRunmode = true;
         }
-
+        
 
         if (fastRunmode)
         {
@@ -112,18 +151,15 @@ public class TOBORTank extends OpMode {
         robo.rightTrackUp.setPower(.83533 * (-Range.clip(gamepad2.right_stick_y,-1,1)));
         robo.leftTrackUp.setPower(-Range.clip(gamepad2.right_stick_y, -1,1));
 
-        
-        
-        if (gamepad2.right_bumper)
-        {
-            robo.RPlate.setPosition(.08);
-            robo.LPlate.setPosition(1);
-        }
-        else
-        {
-            robo.RPlate.setPosition(.81);
-            robo.LPlate.setPosition(.27);
-        }
+
+
+            if (gamepad2.right_bumper) {
+                robo.RPlate.setPosition(robo.RPlateupval);
+                robo.LPlate.setPosition(robo.LPlateupval);
+            } else {
+                robo.RPlate.setPosition(robo.RPlatedownval);
+                robo.LPlate.setPosition(robo.LPlatedownval);
+            }
 
 
         if (gamepad2.dpad_up)
@@ -138,11 +174,12 @@ public class TOBORTank extends OpMode {
         {
             robo.arm(HardwareTOBOR.armPos.Back);
         }
-        /*if (gamepad2.right_trigger >= 0.1)
+
+        /*if (gamepad1.right_bumper)
         {
             robo.relicArmTurn.setPower(1);
         }
-        else if (gamepad2.left_trigger >=0.1)
+        else if (gamepad1.left_bumper)
         {
             robo.relicArmTurn.setPower(-1);
         }
@@ -150,10 +187,6 @@ public class TOBORTank extends OpMode {
         {
             robo.relicArmTurn.setPower(0);
         }*/
-        telemetry.addData("RPlate", robo.RPlate.getPosition());
-        telemetry.addData("LPlate", robo.LPlate.getPosition());
-        telemetry.addData("JoystickL", gamepad2.left_stick_y);
-        telemetry.addData("JoystickR", gamepad2.right_stick_y);
     }
 
 

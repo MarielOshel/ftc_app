@@ -101,8 +101,8 @@ import java.util.Locale;
  * @see <a href="https://www.bosch-sensortec.com/bst/products/all_products/bno055">BNO055 product page</a>
  * @see <a href="https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST_BNO055_DS000_14.pdf">BNO055 specification</a>
  */
-@TeleOp(name = "Rev Robotics IMU Calibration", group = "Polybot")
-//@Disabled                            // Uncomment this to add to the opmode list
+@TeleOp(name = "Rev Robotics IMU Calibration Onbot", group = "Polybot")
+@Disabled                            // Uncomment this to add to the opmode list
 public class RevGyroCalibration extends LinearOpMode
     {
     //----------------------------------------------------------------------------------------------
