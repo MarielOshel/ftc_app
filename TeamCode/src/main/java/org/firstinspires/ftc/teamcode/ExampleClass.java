@@ -32,20 +32,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 
 /**
  * Demonstrates how to setup and use 1 MR color sensor
  */
-@Autonomous(name = "Read Color Sensor with HSV", group = "Example")
+@Autonomous(name = "Create New Class from Color Sensor", group = "Example")
 //@Disabled
-public class Example1ColorSensor extends OpMode {
+
+class ColorMinMax {
+    double Min = 0;
+    double Max = 0;
+}
+
+
+public class ExampleClass extends OpMode {
 
     ColorSensor colorSensor;
+    ColorMinMax colorSensorCal;
+
     //Array to hold the HSV values
     float hsvValues[] = {0F,0F,0F};
 
@@ -55,8 +65,7 @@ public class Example1ColorSensor extends OpMode {
         //This can be used to use a different address for the MR Color Sensor
         //It comes from the factory with 0x3C, but if you want to more than one
         //you need ot change the reference address on one of them.
-        //colorSensor.setI2cAddress(I2cAddr.create8bit(0x3C));  //MR robotics color default address
-        //colorSensor.setI2cAddress(I2cAddr.create8bit(0x39));    //Rev robotics color default address
+        colorSensor.setI2cAddress(I2cAddr.create8bit(0x3C));
         //This command is used to turn the color sensor LED on and off.  In this
         //statement the LED is turned off.
         colorSensor.enableLed(false);
@@ -81,9 +90,8 @@ public class Example1ColorSensor extends OpMode {
         } else {
             colorSensor.enableLed(true);
         }
-        //Ths Java method will convert RGB values to HSV.  The values need to multiplied to have the correct input range
-        //Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues); //For MR HSV conversion
-        Color.RGBToHSV(colorSensor.red() * 255, colorSensor.green() * 255, colorSensor.blue() * 255, hsvValues); //For Rev HSV conversion
+        //Ths Java method will convert RGB values to HSV.  The values need to multiplied by 8 to have the correct input range
+        Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
 
         telemetry.addData("0", "Press A on Gamepad1 to turn off LED");
         telemetry.addData("1", "Red: " + colorSensor.red());

@@ -31,35 +31,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
 import android.graphics.Color;
+import android.view.View;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
- * Demonstrates how to setup and use 1 MR color sensor
+ * Demonstrates how to setup and use Rev Color Distance sensor
  */
-@Autonomous(name = "Read Color Sensor with HSV", group = "Example")
+@Autonomous(name = "Read Color and Dist Rev Sensor", group = "Example")
 //@Disabled
-public class Example1ColorSensor extends OpMode {
+public class ExampleRevColorDistance extends OpMode {
 
     ColorSensor colorSensor;
+    DistanceSensor distanceSensor;
     //Array to hold the HSV values
     float hsvValues[] = {0F,0F,0F};
 
+    public View relativeLayout;
+
+
     @Override
     public void init() {
-        colorSensor = hardwareMap.colorSensor.get("colorsensor");
-        //This can be used to use a different address for the MR Color Sensor
-        //It comes from the factory with 0x3C, but if you want to more than one
-        //you need ot change the reference address on one of them.
-        //colorSensor.setI2cAddress(I2cAddr.create8bit(0x3C));  //MR robotics color default address
+        colorSensor = hardwareMap.get(ColorSensor.class,"colorsensor");
         //colorSensor.setI2cAddress(I2cAddr.create8bit(0x39));    //Rev robotics color default address
-        //This command is used to turn the color sensor LED on and off.  In this
-        //statement the LED is turned off.
-        colorSensor.enableLed(false);
+
+        // get a reference to the distance sensor that shares the same name.
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorsensor");
+
+
+        // get a reference to the RelativeLayout so we can change the background
+        // color of the Robot Controller app to match the hue detected by the RGB sensor.
+        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
+        relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
+
 
         telemetry.addData("Status", "Initialized");
     }
@@ -75,17 +86,13 @@ public class Example1ColorSensor extends OpMode {
 
     @Override
     public void loop() {
-        //Pressing "A" on gamepad 1 will turn the LED off.  When not pressed it will be on.
-        if(gamepad1.a) {
-            colorSensor.enableLed(false);
-        } else {
-            colorSensor.enableLed(true);
-        }
-        //Ths Java method will convert RGB values to HSV.  The values need to multiplied to have the correct input range
-        //Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues); //For MR HSV conversion
-        Color.RGBToHSV(colorSensor.red() * 255, colorSensor.green() * 255, colorSensor.blue() * 255, hsvValues); //For Rev HSV conversion
+        //This Java method will convert RGB values to HSV.  The values need to multiplied to have the correct input range
+        Color.RGBToHSV(colorSensor.red() * 255,
+                colorSensor.green() * 255,
+                colorSensor.blue() * 255,
+                hsvValues); //For Rev HSV conversion
 
-        telemetry.addData("0", "Press A on Gamepad1 to turn off LED");
+        telemetry.addData("0", "Distance" + distanceSensor.getDistance(DistanceUnit.INCH));
         telemetry.addData("1", "Red: " + colorSensor.red());
         telemetry.addData("2", "Green: " + colorSensor.green());
         telemetry.addData("3", "Blue: " + colorSensor.blue());
@@ -93,8 +100,24 @@ public class Example1ColorSensor extends OpMode {
         telemetry.addData("5", "Hue: " + hsvValues[0]);
         telemetry.addData("6", "Sat: " + hsvValues[1]);
         telemetry.addData("7", "Val: " + hsvValues[2]);
+
+        // change the background color to match the color detected by the RGB sensor.
+        // pass a reference to the hue, saturation, and value array as an argument
+        // to the HSVToColor method.
+        relativeLayout.post(new Runnable() {
+            public void run() {
+                relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, hsvValues));
+            }
+        });
     }
 
     @Override
-    public void stop() {}
+    public void stop() {
+        // Set the panel back to the default color
+        relativeLayout.post(new Runnable() {
+            public void run() {
+                relativeLayout.setBackgroundColor(Color.WHITE);
+            }
+        });
+    }
 }
