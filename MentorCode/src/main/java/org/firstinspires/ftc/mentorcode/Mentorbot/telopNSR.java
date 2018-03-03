@@ -1,12 +1,14 @@
-package org.firstinspires.ftc.teamcode.Mentorbot;
+package org.firstinspires.ftc.mentorcode.Mentorbot;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Teleop", group="World")
+@Disabled
 public class telopNSR extends toborParent {
 
     enum driveMode{shooting, lifting}

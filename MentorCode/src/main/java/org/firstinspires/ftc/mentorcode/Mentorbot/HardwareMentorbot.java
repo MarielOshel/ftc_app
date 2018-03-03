@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Mentorbot;
+package org.firstinspires.ftc.mentorcode.Mentorbot;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;

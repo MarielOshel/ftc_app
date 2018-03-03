@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.Mentorbot;
+package org.firstinspires.ftc.mentorcode.Mentorbot;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -57,7 +57,7 @@ import java.util.List;
 
 
 @TeleOp(name = "Tobor Vuforia", group = "Ohio")
-//@Disabled
+@Disabled
 public class toborVuforia  {
 
     //enumeration of the images on the field

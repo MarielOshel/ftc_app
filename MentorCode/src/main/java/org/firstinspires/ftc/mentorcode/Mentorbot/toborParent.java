@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode.Mentorbot;
+package org.firstinspires.ftc.mentorcode.Mentorbot;
 
 import android.util.Log;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -24,10 +25,11 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Mentorbot.toborVuforia;
+import org.firstinspires.ftc.mentorcode.Mentorbot.toborVuforia;
 
 
 @TeleOp(name = "ToborParent", group = "NSR")
+@Disabled
 public abstract class toborParent extends OpMode {
 
     //all distances in in millimeters, all angles in degrees, all time in seconds
