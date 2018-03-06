@@ -34,13 +34,11 @@ package org.firstinspires.ftc.team7234;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.team7234.RelicVuMarkIdentification2;
-import org.firstinspires.ftc.team7234.HardwareBotman;
+import org.firstinspires.ftc.team7234.common.HardwareBotman;
+import org.firstinspires.ftc.team7234.common.RelicVuMarkIdentification2;
 
 import static com.sun.tools.javac.util.Constants.format;
 
