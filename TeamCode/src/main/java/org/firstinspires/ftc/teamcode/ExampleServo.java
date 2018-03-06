@@ -34,8 +34,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -52,18 +57,20 @@ public class ExampleServo extends OpMode {
     @Override
     public void init() {
         myServo = hardwareMap.servo.get("servo name");
-        myServo.setPosition(0);
+
+        ServoControllerEx theControl = (ServoControllerEx)myServo.getController();
+        int thePort = myServo.getPortNumber();
+        PwmControl.PwmRange theRange = new PwmControl.PwmRange(553,2500);
+        theControl.setServoPwmRange(thePort,theRange);
+
+        myServo.setPosition(1);
+
         timer.reset();
     }
 
     @Override
     public void init_loop() {
-        if(timer.seconds() > 2) {
-            myServo.setPosition(0);
-            timer.reset();
-        } else if(timer.seconds() > 1) {
-            myServo.setPosition(1);
-        }
+
 
         telemetry.addData("Status:", "Robot is Initialized");
         telemetry.addData("Press Start ", "To control the servo with the joystick.");
