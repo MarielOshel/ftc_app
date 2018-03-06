@@ -4,14 +4,15 @@ import android.graphics.Color;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.team7234.common.HardwareBotman;
+import org.firstinspires.ftc.team7234.common.RelicVuMarkIdentification2;
 
-import java.util.logging.Logger;
-
-
+@Disabled
 @Autonomous(name = "NEW Red Close", group = "DB")
 public class RedCloseAuto7234 extends OpMode{
 

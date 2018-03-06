@@ -4,12 +4,15 @@ import android.graphics.Color;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.team7234.common.HardwareBotman;
+import org.firstinspires.ftc.team7234.common.RelicVuMarkIdentification2;
 
-
+@Disabled
 @Autonomous(name = "Red Far", group = "DB")
 public class RedFarAuto7234 extends OpMode{
     private static final String logTag = RedCloseAuto7234.class.getName();
