@@ -1,17 +1,22 @@
-package org.firstinspires.ftc.team7234;
+package org.firstinspires.ftc.team7234.opmodes.teleop;
+
+import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.team7234.common.HardwareBotman;
+
 @TeleOp(name="BotmanTeleOp", group="Pushbot")
-//@Disabled
 public class BotmanTeleOp extends OpMode{
 
     /* Declare OpMode members. */
     private HardwareBotman robot       = new HardwareBotman();
     //region Local Variable Declaration
+
+    private final String logTag = HardwareBotman.class.getName();
 
     private static final double driveCurve = 1.0;
     private static final double extensionPow = 0.5;
@@ -33,9 +38,9 @@ public class BotmanTeleOp extends OpMode{
     private boolean orientationToggle;
     private boolean rotationToggle;
 
-    double magnitude;
-    double rotation;
-    double angle;
+    private double magnitude;
+    private double rotation;
+    private double angle;
 
     private HardwareBotman.GripperState gripState = HardwareBotman.GripperState.OPEN;
 
@@ -68,8 +73,7 @@ public class BotmanTeleOp extends OpMode{
 
         //endregion
         relicPos = robot.relicClaw.getPosition();
-
-
+        Log.i(logTag, "Robot Initialized");
     }
     @Override
     public void init_loop(){}
@@ -97,6 +101,11 @@ public class BotmanTeleOp extends OpMode{
             case LEFT:
                 if (robot.heading() > targetHead - 3.0 && robot.heading() < targetHead + 3.0){
                     turnState = turningState.NORMAL;
+                    Log.i(logTag, "Left Turn completed, Target heading was: "
+                            + targetHead
+                            + "\nRobot Heading is now: "
+                            + robot.heading()
+                    );
                     break;
                 }
                 else{
@@ -106,6 +115,11 @@ public class BotmanTeleOp extends OpMode{
             case RIGHT:
                 if (robot.heading() >targetHead - 3.0 && robot.heading() < targetHead + 3.0){
                     turnState = turningState.NORMAL;
+                    Log.i(logTag, "Right Turn completed, Target heading was: "
+                            + targetHead
+                            + "\nRobot Heading is now: "
+                            + robot.heading()
+                    );
                     break;
                 }
                 else{
@@ -138,8 +152,8 @@ public class BotmanTeleOp extends OpMode{
             armPower = gamepad2.left_trigger - gamepad2.right_trigger;
         }
         //endregion
-        //region 5 Claw
-        relicIncrementing = gamepad2.right_stick_y / 500.0;
+        //region Claw
+        relicIncrementing = gamepad2.right_stick_y / 250.0;
 
         if (relicPos + relicIncrementing > 1.0){
             relicPos = 1.0;
@@ -273,6 +287,9 @@ public class BotmanTeleOp extends OpMode{
         telemetry.addData("Angle: ", angle);
         telemetry.addData("Magnitude: ", magnitude);
         telemetry.addData("Rotation: ", rotation);
+        telemetry.addLine();
+        telemetry.addData("Arm: ", armPower);
+        telemetry.addData("Arm-pow: ", robot.arm.getPower());
         telemetry.addLine();
         telemetry.addData("Relic Power: ", relicPower);
         telemetry.addData("Relic Position: ", relicPos);
